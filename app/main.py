@@ -1,4 +1,4 @@
-"""单个 FastAPI 入口，装配三组路由；启动不隐式初始化数据库。"""
+"""单个 FastAPI 入口，装配三组业务路由与公共认证入口；启动不隐式初始化数据库。"""
 
 import sqlite3
 from typing import Optional
@@ -9,6 +9,8 @@ from fastapi.staticfiles import StaticFiles
 
 from app.common.config import PROJECT_ROOT, Settings, get_settings
 from app.common.db import connect_database
+from app.d.auth.errors import install_error_handlers
+from app.d.auth.router import router as auth_router
 from app.m1.router import router as m1_router
 from app.m2.router import router as m2_router
 from app.m3.router import router as m3_router
@@ -18,6 +20,9 @@ def create_app(settings: Optional[Settings] = None) -> FastAPI:
     settings = settings or get_settings()
     application = FastAPI(title="校园资源服务平台", version=settings.version)
     application.state.settings = settings
+    install_error_handlers(application)
+    # 认证由 G2 拥有，随 /m2 挂载点提供，三组共用同一会话与错误体。
+    application.include_router(auth_router, prefix="/m2")
     application.include_router(m1_router, prefix="/m1", tags=["M1 自习座位预约"])
     application.include_router(m2_router, prefix="/m2", tags=["M2 教室借用审批"])
     application.include_router(m3_router, prefix="/m3", tags=["M3 设施报修"])
