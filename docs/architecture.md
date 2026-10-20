@@ -23,11 +23,23 @@ A–F 是计划中的角色占位，人员与 GitHub 账号须在实际认领时
 ## 数据与接口约束
 
 - D 管房间、座位身份、位置和属性；M1 管预约、可约时段和占用状态。共享一个 SQLite 文件不代表可以跨模块直接写表。
-- 各模块用同一套用户身份和固定角色检查；公共认证接口在字段会议确定后实现。当前不提供硬编码“已登录”依赖。
-- 公共主键、用户/角色字段、房间容量、时间格式/时区、审批状态、工单状态和错误响应均待三组冻结。由 G3 汇总唯一首版 schema，各组提交字段需求，避免分别定义重复表。
+- 各模块用同一套用户身份和固定角色检查；G2 已按下方[公共契约](#公共契约g2-提案2026-10-20)提出账号、角色、会话与教室申请字段，工单状态与座位/楼宇主数据仍待 G3 冻结。当前不提供硬编码“已登录”依赖。
+- 公共主键、用户/角色字段、房间容量、时间格式/时区、审批状态、工单状态和错误响应须三组冻结。由 G3 汇总唯一首版 schema，各组提交字段需求，避免分别定义重复表；G2 的字段需求见 [SPEC-001](specs/001-auth-session-rbac.md) 与 [SPEC-002](specs/002-m2-room-application.md)。
 - 业务表尚不存在，数据库版本为 0。第一版真实业务迁移是 `database/migrations/V1__init.sql`；提交后结构调整新增 V2、V3，不改旧版本。细节见 [数据库说明](../database/README.md)。
 - 每次连接启用外键并明确事务范围；输入值采用 SQL 参数绑定，连接用完关闭。测试使用独立临时 SQLite，不读取开发库。
 - 后续 M3→M1 以 HTTP 写回座位状态，具体契约见 ADR-003 提案；本轮延期，不把共享数据库调用当网络调用完成。
+
+## 公共契约（G2 提案，2026-10-20）
+
+三组共用身份、权限、时间与错误语义。下列内容由 G2 在 Review 1 提出，写入 `V1__init.sql` 前需 G1/G3 确认；未确认前不视作已冻结，其他组只追加自己的权限码与业务表。任务范围见 [SPEC-001](specs/001-auth-session-rbac.md)、[SPEC-002](specs/002-m2-room-application.md)，取舍理由见 [ADR-004](../.agents/notes/proposed/architecture/2026-10-20-adr-004-server-session-auth.md)。
+
+账号与授权使用 `app_user`、`role`、`permission`、`user_role`、`role_permission` 五表：口令只存 PBKDF2 派生值，`username` 唯一，`status ∈ {ACTIVE, DISABLED}`。固定角色为 `student`、`teacher`、`org_leader`、`approver`、`repairer`、`admin`，本轮不做角色管理页面。权限码按 `<模块>:<动作>` 命名，各组只声明自己的：G2 声明 `room:apply`（授予 `teacher`、`org_leader`）与 `room:approve`（`approver`、`admin`）；`student` 不授予 `room:apply`，用于演示拒绝路径。
+
+会话使用 `session` 表，只存 `sha256(令牌)`，配合 `HttpOnly`、`SameSite=Lax` 的 Cookie `campus_session`；退出写 `revoked_at`，任何地方都不保存明文令牌。
+
+时间一律保存为 UTC 文本 `YYYY-MM-DDTHH:MM:SSZ`，可直接比较与排序；页面与接口按 `Asia/Shanghai` 输入输出，转换在服务端完成。错误响应统一为 `{"error": "<code>", "message": "<中文说明>"}`：`401` 未登录或凭据错误，`403` 无权限或非本人，`404` 不存在，`409` 状态冲突，`422` 字段不合法。
+
+教室申请状态为 `PENDING_L1`、`PENDING_L2`、`APPROVED`、`REJECTED`、`REVOKED`、`CANCELLED`；本轮只实现 `PENDING_L1 → APPROVED | REJECTED`，其余按计划延期。`PENDING_L1`、`PENDING_L2`、`APPROVED` 视为占用教室时段，重叠判定只对这三种状态生效。
 
 ## 本轮集成顺序
 
