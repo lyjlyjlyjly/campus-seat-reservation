@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "校园资源服务平台 · Review 1 计划逻辑",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "viewBox": [1160, 550]
+  },
+  "components": [
+    {
+      "id": "campus-browser",
+      "type": "frontend",
+      "label": "浏览器页面",
+      "sublabel": "HTML / CSS · 当前操作即时提示",
+      "pos": [405, 20],
+      "size": [350, 80]
+    },
+    {
+      "id": "campus-application",
+      "type": "backend",
+      "label": "一个 FastAPI 应用",
+      "sublabel": "同一进程 · 注册占位，业务待实现",
+      "tag": "路由注册占位 · 业务待实现",
+      "pos": [405, 145],
+      "size": [350, 96]
+    },
+    {
+      "id": "g1-seat-reservations",
+      "type": "backend",
+      "label": "G1 · 自习座位预约",
+      "sublabel": "M1 /m1 · 搜索 → 预约",
+      "tag": "G1 负责人：A / B",
+      "pos": [50, 292],
+      "size": [280, 96]
+    },
+    {
+      "id": "g2-room-approvals",
+      "type": "backend",
+      "label": "G2 · 整教室申请",
+      "sublabel": "M2 /m2 · 申请 → 一级审批",
+      "tag": "G2 负责人：C / D",
+      "pos": [440, 292],
+      "size": [280, 96]
+    },
+    {
+      "id": "g3-maintenance-orders",
+      "type": "backend",
+      "label": "G3 · 物业报修工单",
+      "sublabel": "M3 /m3 · 报修 → 派单 → 流转",
+      "tag": "G3 负责人：E / F",
+      "pos": [830, 292],
+      "size": [280, 96]
+    },
+    {
+      "id": "campus-shared-sqlite",
+      "type": "database",
+      "label": "共用一个 SQLite 文件",
+      "sublabel": "G3 汇总 V1__init.sql 与幂等种子",
+      "tag": "各组拥有本模块数据与规则",
+      "pos": [405, 434],
+      "size": [350, 96]
+    }
+  ],
+  "connections": [
+    {"id": "browser-to-app", "from": "campus-browser", "to": "campus-application", "label": "HTTP 请求 / 页面响应", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "labelDy": 35},
+    {"id": "app-to-g1", "from": "campus-application", "to": "g1-seat-reservations", "label": "路由分派", "fromSide": "left", "toSide": "top"},
+    {"id": "app-to-g2", "from": "campus-application", "to": "g2-room-approvals", "label": "路由分派", "fromSide": "bottom", "toSide": "top", "labelDy": 38},
+    {"id": "app-to-g3", "from": "campus-application", "to": "g3-maintenance-orders", "label": "路由分派", "fromSide": "right", "toSide": "top"},
+    {"id": "g1-to-sqlite", "from": "g1-seat-reservations", "to": "campus-shared-sqlite", "label": "预约记录", "fromSide": "bottom", "toSide": "left"},
+    {"id": "g2-to-sqlite", "from": "g2-room-approvals", "to": "campus-shared-sqlite", "label": "申请 / 会话", "fromSide": "bottom", "toSide": "top", "labelDy": 35},
+    {"id": "g3-to-sqlite", "from": "g3-maintenance-orders", "to": "campus-shared-sqlite", "label": "工单 / 空间主数据", "fromSide": "bottom", "toSide": "right"}
+  ],
+  "cards": [
+    {"dot": "cyan", "title": "G1 · 预约规则", "items": ["整点 1–4 小时；拒绝冲突与超时长。", "M1 拥有预约状态；D 只提供空间主数据。"]},
+    {"dot": "emerald", "title": "G2 · 共用登录与固定角色", "items": ["兼任 D-R01 / R02：会话 Cookie、固定 RBAC。", "三组复用同一登录契约；/d 业务接口待定。"]},
+    {"dot": "amber", "title": "G3 · 共用数据与操作提示", "items": ["兼任 D-R03：楼宇、教室、座位与虚构种子。", "D-R04 约定由三组页面采用；无后台通知。"]}
+  ]
+}

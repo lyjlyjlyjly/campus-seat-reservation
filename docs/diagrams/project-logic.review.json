@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "diagram_type": "architecture",
+  "reviewDate": "2026-10-20",
+  "reviewer": "Codex image-capable agent; self-review, not a team member approval",
+  "output": "project-logic.html",
+  "specification_sha256": "429c550e08d400fc0ff126d9118de83dcd1b427cd0838f2a0fd2a37d0710bc8a",
+  "artifact_sha256": "0e5ef60e0dc9dd804e83f741a2074248085100bd5329856ca3e4293fa70013a6",
+  "artifact_bytes": 804905,
+  "validation": "9/9 showcase, 0 errors, 0 warnings",
+  "browser_evidence": "passed",
+  "browser_receipt": "project-logic.visual-check.json",
+  "visual_review": "passed",
+  "correction_rounds": 2,
+  "state": {"detail": "read", "motion": "still"},
+  "reviewed_images": [
+    "project-logic.visual-check.1440x900.light.png",
+    "project-logic.visual-check.1440x900.dark.png",
+    "project-logic.visual-check.2048x1320.light.png",
+    "project-logic.visual-check.2048x1320.dark.png"
+  ],
+  "observations": [
+    "最终四张截图中的三组业务链、路由前缀及单进程占位说明可见。",
+    "三组路由清晰分列并连接同一个 SQLite；连线和标签没有遮挡。",
+    "两种主题下节点、卡片和底部导航完整；最大桌面的主图与说明卡片保持平衡。"
+  ],
+  "scope_limitations": [
+    "审阅范围是最终 HTML 的默认 READ / Still 视图及对应截图。",
+    "未逐项测试交互搜索、全部导出格式和移动端；不将显示检查作为业务实现验收。"
+  ]
+}

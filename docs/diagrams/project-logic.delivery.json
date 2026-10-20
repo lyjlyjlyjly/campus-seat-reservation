@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "deliver",
+  "type": "architecture",
+  "input": "F:\\gitlab\\校园资源服务平台\\docs\\diagrams\\project-logic.archify.json",
+  "output": "F:\\gitlab\\校园资源服务平台\\docs\\diagrams\\project-logic.html",
+  "specification": {
+    "sha256": "429c550e08d400fc0ff126d9118de83dcd1b427cd0838f2a0fd2a37d0710bc8a",
+    "bytes": 3551
+  },
+  "artifact": {
+    "sha256": "0e5ef60e0dc9dd804e83f741a2074248085100bd5329856ca3e4293fa70013a6",
+    "bytes": 804905
+  },
+  "validation": {
+    "checksPassed": 9,
+    "checkCount": 9,
+    "compositionProfile": "showcase",
+    "compositionStatus": "pass",
+    "errors": 0,
+    "warnings": 0
+  }
+}

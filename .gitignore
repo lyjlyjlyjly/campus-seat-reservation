@@ -1,0 +1,36 @@
+# Python / local tools
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Runtime data and credentials; rules and .agents/notes remain versioned.
+var/
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.log
+logs/
+
+# Local editor / operating system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

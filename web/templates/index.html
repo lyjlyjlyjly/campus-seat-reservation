@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>校园资源服务平台</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+  </head>
+  <body>
+    <main class="page">
+      <header>
+        <p class="eyebrow">CAMPUS RESOURCE SERVICES</p>
+        <h1>校园资源服务平台</h1>
+        <p class="intro">自习座位、教室借用、设施报修，汇入同一个校园服务入口。</p>
+        <p class="status">项目基础骨架已就绪 · 业务功能待接入</p>
+      </header>
+
+      <section class="modules" aria-label="三组业务分工">
+        <article class="module">
+          <p class="group">G1 / M1</p>
+          <h2>自习座位预约</h2>
+          <p>计划实现座位搜索、整点时段预约，以及冲突和时长校验。</p>
+          <p class="route">接入位置 <code>/m1</code></p>
+          <span class="pending">待开发</span>
+        </article>
+        <article class="module">
+          <p class="group">G2 / M2</p>
+          <h2>教室借用审批</h2>
+          <p>计划实现教室申请与一级审批，并为三组提供统一登录和固定角色权限。</p>
+          <p class="route">接入位置 <code>/m2</code></p>
+          <span class="pending">待开发</span>
+        </article>
+        <article class="module">
+          <p class="group">G3 / M3</p>
+          <h2>设施报修</h2>
+          <p>计划实现文字报修、手动派单和维修状态流转，并汇总空间与座位主数据。</p>
+          <p class="route">接入位置 <code>/m3</code></p>
+          <span class="pending">待开发</span>
+        </article>
+      </section>
+
+      <aside class="shared">
+        <h2>共用基础</h2>
+        <p>三个业务模块共用一个应用和数据库。公共字段与登录接口确认后，由各组接入页面与业务逻辑。</p>
+      </aside>
+
+      <footer>
+        <p>开发检查</p>
+        <nav aria-label="基础设施检查">
+          <a href="/health">数据库健康状态</a>
+          <a href="/version">应用版本</a>
+          <a href="/docs">接口文档</a>
+        </nav>
+      </footer>
+    </main>
+  </body>
+</html>

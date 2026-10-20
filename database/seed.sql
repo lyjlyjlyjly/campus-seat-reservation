@@ -1,0 +1,5 @@
+-- 演示种子入口；仅在 python -m app.bootstrap --seed 时执行。
+-- 当前公共字段尚未冻结，因此不创建业务表、不写入演示用户或业务订单。
+-- G3 在三组确认 V1__init.sql 后补充虚构主数据与演示账号。
+-- 使用唯一约束与 INSERT OR IGNORE 等方式保证多次执行幂等。
+-- 不在此脚本管理事务、PRAGMA user_version 或 PRAGMA foreign_keys。

@@ -1,0 +1,16 @@
+# Verified repository owner from origin; temporary fallback until group accounts are known.
+* @lyjlyjlyjly
+
+# Replace the fallback with real accounts after the ownership meeting.
+# The following comments are responsibility notes, NOT active review rules.
+# G1: /app/m1/ /tests/m1/
+# G2: /app/m2/ /tests/m2/ /app/d/auth/ /app/d/audit/
+# G3: /app/m3/ /tests/m3/ /app/d/spaces/ /database/ /app/bootstrap.py
+# Project owner + another affected group: /app/common/ /app/main.py /tests/d/
+# G2 coordinates shared layout; G3 coordinates feedback: /web/
+# Infrastructure owner: /.github/ /scripts/
+# Requirements owner: /docs/requirements.md
+# Project owner + affected group: /AGENTS.md /.agents/notes/
+
+# Example syntax only: /app/m1/ @actual-user-a @actual-user-b
+# CODEOWNERS cannot replace branch protection or actual cross-group approval.
