@@ -82,10 +82,22 @@ CREATE INDEX room_application_applicant ON room_application (applicant_id);
 - Given 同房间与已存在申请时段重叠，When 提交 `PENDING_L1`，Then `409`；Given 仅首尾相接（`end == 新 start`），Then `201`；Given 同房间但另一方已 `REJECTED`，Then `201`。
 - Given 待审申请与 `approver` 会话，When approve，Then `200`，状态 `APPROVED`，记录 `decided_by` 与 `updated_at`；When 再次 approve，Then `409` 且状态不变。
 - Given `student` 或 `teacher` 会话，When approve，Then `403`；Given 不存在的 id，Then `404`。
-- Given reject 且带 `decision_note`，Then `200`、状态 `REJECTED`、备注保存；无备注时允许但记为 `NULL`。
+- Given reject 且带 `decision_note`，Then `200`、状态 `REJECTED`、备注保存；Given 无备注，Then `422`（驳回必须给申请人可读的理由）。
+- Given 审批人对自己提交的申请 approve/reject，Then `409`（自己不能批自己）。
 - Given 本人申请列表，When `GET /m2/applications`，Then 只返回自己的记录；Given `approver` 请求待审列表，Then 返回 `PENDING_L1` 记录。
 - Given 非法 `status` 值，When 直接写库，Then 被 `CHECK` 约束拒绝（在 schema 测试中断言）。
 
 ## 验证计划
 
 `python -m pytest tests/m2 -q`；`python scripts/ci.py`；本机 `uvicorn` + `curl` 走一遍“teacher 申请 → approver 通过 → 重复审批 409”，并把实际命令与结果补到本节下方。
+
+## 实际结果
+
+验证日期 2026-10-21，执行 `.venv/bin/python -m pytest tests/m2 tests/d -q` → 42 passed；
+`.venv/bin/python scripts/ci.py` → 130 passed 且输出 `[CI] All checks passed.`。
+
+- 已实现：`GET /m2/rooms`、`POST /m2/applications`、`GET /m2/applications`（含 `?status=`）、`GET /m2/applications/pending`、`GET /m2/applications/{id}`、`POST …/approve`、`POST …/reject`。
+- 并发：`create_application` 与 `decide_application` 都在 `BEGIN IMMEDIATE` 事务内先查后写；状态更新带 `WHERE status = 'PENDING_L1'` 并以 `rowcount` 检测被抢先处理的情况，返回 `409`。
+- 与计划的差异：①驳回归还时把「无备注允许」收紧为 `422`；②「自己不能批自己」写成显式 `409` 并加测试（演示账号默认不同时持两项权限，测试在临时库补授权后验证该分支）。
+- 未实现（按 Review 1 范围延期）：二级审批、申请人撤销、超时撤销、M2 占用/释放 M1 座位、审计写入。
+- 待人工：页面侧用 curl/浏览器走查一遍；`decided_by` 展示名依赖种子账号。
