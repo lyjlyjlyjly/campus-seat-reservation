@@ -2,7 +2,7 @@
 
 基线日期：2026-10-20。来源：[课程任务书](Pj-任务书.md)、[PJ 计划书](PJ-计划书.md)；本轮安排按 [Review 1 计划](Review1计划.md) 执行。本文件维护需求状态与证据，任务安排和依赖见 Review 1 计划第 4 节。
 
-当前只有 [SPEC-000 仓库骨架](specs/000-repository-bootstrap.md)、[SPEC-001 登录会话与 RBAC](specs/001-auth-session-rbac.md)、[SPEC-002 教室申请与一级审批](specs/002-m2-room-application.md)，以下业务需求均未交付。`app/m1/`、`app/m2/`、`app/m3/`、`app/d/` 是预留实现目录，不能作为需求已完成的证据。表中“待开发”不是“已实现”；完成时必须把实现、实际测试和 PR 链接填入证据列。
+当前只有 [SPEC-000 仓库骨架](specs/000-repository-bootstrap.md)、[SPEC-001 登录会话与 RBAC](specs/001-auth-session-rbac.md)、[SPEC-002 教室申请与一级审批](specs/002-m2-room-application.md)。G2 的首轮需求（D-R01、D-R02 固定部分、M2-R01、M2-R02、M2-R03 一级）已实现并有行为测试；M1、M3 以及下表标注“延期 R1”的条目均未交付。`app/m1/`、`app/m2/`、`app/m3/`、`app/d/` 是预留实现目录，不能作为需求已完成的证据。表中“待开发”不是“已实现”；完成时必须把实现、实际测试和 PR 链接填入证据列。
 
 ## 本轮口径
 
@@ -30,9 +30,9 @@
 
 | ID | 需求 | Given–When–Then 验收 | 本轮安排 | 实现 / 测试 / PR |
 |---|---|---|---|---|
-| M2-R01 | 申请角色门槛 | Given 有/无申请权限的演示账号，When 提交申请，Then 仅有权限者可创建记录；无权限返回拒绝。 | 待开发；`room:apply` = `teacher`、`org_leader`，学生拒（[SPEC-001](specs/001-auth-session-rbac.md)） | — |
-| M2-R02 | 教室、时段、用途和人数申请 | Given 有权限的用户和开放房间，When 必填信息完整、人数不超容量、时段合法，Then 保存申请；非法输入被拒绝。 | 待开发；见 [SPEC-002](specs/002-m2-room-application.md) | — |
-| M2-R03 | 多级通过/驳回 | Given 待审申请，When 有权限审批员操作，Then 按本级状态通过或驳回；普通用户与重复非法流转被拒绝。 | 部分待开发：一级；二级延期 R1 | — |
+| M2-R01 | 申请角色门槛 | Given 有/无申请权限的演示账号，When 提交申请，Then 仅有权限者可创建记录；无权限返回拒绝。 | 已交付 2026-10-21；`room:apply` = `teacher`、`org_leader`，学生拒（[SPEC-001](specs/001-auth-session-rbac.md)） | `app/m2/router.py` + `tests/m2/test_applications.py::test_m2_r01_*`（403/401）；破坏实验 C |
+| M2-R02 | 教室、时段、用途和人数申请 | Given 有权限的用户和开放房间，When 必填信息完整、人数不超容量、时段合法，Then 保存申请；非法输入被拒绝。 | 已交付 2026-10-21；见 [SPEC-002](specs/002-m2-room-application.md) | `app/m2/{router,applications,times}.py` + `tests/m2/test_applications.py::test_m2_r02_*`（容量/整点/时长/冲突/越权查看） |
+| M2-R03 | 多级通过/驳回 | Given 待审申请，When 有权限审批员操作，Then 按本级状态通过或驳回；普通用户与重复非法流转被拒绝。 | 部分已交付：一级通过/驳回（含驳回必填理由、自己不能批自己）；二级延期 R1 | `app/m2/applications.py::decide_application` + `tests/m2/test_applications.py::test_m2_r03_*`；破坏实验 B |
 | M2-R04 | 超时撤销 | Given 某级超过配置处理时限或开始时间已过，When 定时处理，Then 申请仅撤销一次，不允许继续审批。 | 延期 R1 | — |
 | M2-R05 | 申请人撤销与状态查询 | Given 本人的申请，When 查询或在允许状态撤销，Then 返回当前状态或完成撤销；不可修改他人申请。 | 延期 R1 | — |
 | M2-R06 | 审批占用 M1 座位及恢复 | Given 已确认的占用/恢复契约，When 审批或撤销，Then 对应时段的 M1 状态一致并可追溯。 | 延期 R1，链路 B 待讨论 | — |
@@ -52,8 +52,8 @@
 
 | ID | 归属与需求 | Given–When–Then 验收 | 本轮安排 | 实现 / 测试 / PR |
 |---|---|---|---|---|
-| D-R01 | G2：登录与会话 | Given 虚构演示账号，When 正确登录，Then 设置 HttpOnly Cookie、服务端只存令牌哈希；错误凭据被拒绝，退出后旧会话失效。 | 待开发；见 [SPEC-001](specs/001-auth-session-rbac.md) | — |
-| D-R02 | G2：RBAC | Given 固定角色及权限种子，When 访问受限操作，Then 按固定授权允许/拒绝；后续动态管理应改变实际授权结果。 | 部分待开发：固定角色（[SPEC-001](specs/001-auth-session-rbac.md)）；管理页面延期 R1 | — |
+| D-R01 | G2：登录与会话 | Given 虚构演示账号，When 正确登录，Then 设置 HttpOnly Cookie、服务端只存令牌哈希；错误凭据被拒绝，退出后旧会话失效。 | 已交付 2026-10-21；见 [SPEC-001](specs/001-auth-session-rbac.md) 与 [ADR-004](../.agents/notes/proposed/architecture/2026-10-21-adr-004-session-authentication.md) | `app/d/auth/{password,session,router}.py` + `tests/d/test_auth_password.py`、`tests/d/test_auth_session.py`；破坏实验 A |
+| D-R02 | G2：RBAC | Given 固定角色及权限种子，When 访问受限操作，Then 按固定授权允许/拒绝；后续动态管理应改变实际授权结果。 | 部分已交付：固定角色与权限码判断（[SPEC-001](specs/001-auth-session-rbac.md)）；动态管理页面延期 R1 | `V1__init.sql` 角色/权限/映射 + `app/d/auth/dependencies.py::require_permission` + 越权用例；破坏实验 C |
 | D-R03 | G3：空间主数据 | Given 空业务库，When 初始化及种子各执行两次，Then 虚构楼宇、房间、座位和用户存在且不重复、外键有效。 | 部分待开发：种子；管理 CRUD 延期 R1 | — |
 | D-R04 | G3 约定、三组页面采用：即时提示 | Given 当前操作成功或失败，When 页面收到结果，Then 显示对应提示；不创建异步通知。 | 简化范围待开发；与课程通知要求的差异待确认 | — |
 | D-R05 | G2：操作审计 | Given 关键管理操作，When 操作完成，Then 记录操作者、时间、对象和动作，不写入密码或会话明文。 | 延期 R1 | — |

@@ -103,3 +103,9 @@ CREATE INDEX room_application_applicant ON room_application (applicant_id);
 - 页面：`/m2/login`、`/m2/apply`、`/m2/approve` 三个静态页 + `/assets/m2.js`、`/assets/m2.css`，全部通过公开 JSON 接口读写。
 - 本机 `uvicorn --port 8123` + `curl` 冒烟（2026-10-21）：teacher01 登录 200 → 提交 201 `PENDING_L1`（`09:00+08:00` 存为 `01:00Z`）→ student01 提交 `403 forbidden` → approver01 待审列表可见 → approve 200 `APPROVED` → 重复 approve `409 conflict`。页面与静态资源均 200。
 - 待人工：浏览器里点一遍三个页面的交互；`decided_by` 展示名依赖种子账号。
+
+## 故意破坏实验（2026-10-21）
+
+- **实验 B（冲突判定与状态机）**：把 `app/m2/applications.py` 的重叠条件从 `start_at < 新end AND end_at > 新start` 改成 `start_at = ? AND end_at <> ?`，并把审批的“必须待审”判断改成恒假；`python -m pytest tests/m2 -q` → **2 failed, 15 passed**（时段冲突、重复审批两条用例失败）。恢复后 → **17 passed**。
+- 说明：只破坏状态机时「自己不能批自己」用例仍会通过，因为该护栏在状态判断之前——这反而确认了护栏顺序是有意的。
+- 未覆盖：真正并发的两个请求争抢同一时段（需要多线程/多进程 + 真实锁等待），本轮只验证了“先查后写在同一事务里”的代码路径。

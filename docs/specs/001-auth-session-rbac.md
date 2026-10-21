@@ -98,3 +98,12 @@ CREATE INDEX session_user_id ON session (user_id);
 ## 验证计划
 
 `python -m pytest tests/d -q`；`python scripts/ci.py`；本机 `uvicorn` 启动后用 `curl` 走一遍登录、`/me`、退出、旧 Cookie 复验，并把实际命令与结果补到本节下方。
+
+## 故意破坏实验（2026-10-21）
+
+目的：证明测试真的依赖实现，而不是断言常量。
+
+- **实验 A（口令校验）**：把 `app/d/auth/password.py::verify_password` 首行改成恒 `return True`，`python -m pytest tests/d -q` → **12 failed, 16 passed**（错误口令、非法散列 8 组参数、非字符串入参、登录错误凭据、账号不存在与口令错误文案一致等用例全部失败）。恢复后 → **28 passed**。
+- **实验 C（权限判断）**：把 `app/d/auth/dependencies.py::require_permission` 的判断改成 `if False:`（恒通过），`python -m pytest tests/m2 tests/d -q` → **2 failed, 43 passed**（学生越权提交、教师越权审批）。恢复后 → **45 passed**。
+- 过程教训：实验 A 第一次改错了函数签名（`stored_hash` vs `stored`），文本未替换、测试全绿；后来在脚本里加 `assert 文本已变化` 才确认破坏真的生效。**“测试没红”第一步要先怀疑破坏没生效**，这条已写进下方风险。
+- 未覆盖：`Secure` Cookie 属性、会话清理任务、并发争抢 `BEGIN IMMEDIATE` 的超时行为，均需真实 HTTPS/并发环境，本轮未验证。
