@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>审批台 · 校园资源服务平台</title>
+  <link rel="stylesheet" href="/assets/m2.css">
+</head>
+<body data-page="approve">
+  <header class="m2">
+    <h1>教室借用审批台</h1>
+    <p>一级审批：通过或驳回（驳回必须填写理由）。 <a href="/m2/apply">申请页</a> · <a href="/m2/login">切换账号</a></p>
+  </header>
+  <main class="m2">
+    <section class="card">
+      <h2>待审批申请 <button id="refresh" class="ghost" type="button">刷新</button></h2>
+      <table id="pending-table">
+        <thead><tr><th>申请人</th><th>教室</th><th>时段（本地）</th><th>用途</th><th>操作</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <p id="approve-feedback" class="feedback" role="status"></p>
+    </section>
+  </main>
+  <script src="/assets/m2.js"></script>
+</body>
+</html>

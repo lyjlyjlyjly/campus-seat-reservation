@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>登录 · 校园资源服务平台</title>
+  <link rel="stylesheet" href="/assets/m2.css">
+</head>
+<body data-page="login">
+  <header class="m2">
+    <h1>校园资源服务平台 · 登录</h1>
+    <p>整教室借用与审批（G2）。三组共用同一登录接口与角色。</p>
+  </header>
+  <main class="m2">
+    <section class="card">
+      <h2>演示账号登录</h2>
+      <form id="login-form" novalidate>
+        <label>
+          <span>用户名</span>
+          <input name="username" autocomplete="username" required>
+        </label>
+        <label>
+          <span>口令</span>
+          <input name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <button type="submit">登录</button>
+      </form>
+      <p id="login-feedback" class="feedback" role="status"></p>
+    </section>
+    <section class="card">
+      <h2>本组演示账号</h2>
+      <p class="hint">教师、学生组织负责人可提交申请；审批员、管理员可审批。<code>student01</code> 无申请权限，用于演示拒绝路径。</p>
+      <table>
+        <thead><tr><th>用户名</th><th>口令</th><th>角色</th></tr></thead>
+        <tbody>
+          <tr><td>teacher01</td><td>Teacher#2026</td><td>教师 · 可申请</td></tr>
+          <tr><td>leader01</td><td>Leader#2026</td><td>学生组织负责人 · 可申请</td></tr>
+          <tr><td>approver01</td><td>Approver#2026</td><td>审批员 · 可审批</td></tr>
+          <tr><td>student01</td><td>Student#2026</td><td>学生 · 无申请权限</td></tr>
+        </tbody>
+      </table>
+      <p class="hint">口令仅用于本地演示，全部账号为虚构数据。</p>
+    </section>
+  </main>
+  <script src="/assets/m2.js"></script>
+</body>
+</html>

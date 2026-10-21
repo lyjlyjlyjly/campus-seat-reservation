@@ -1,0 +1,88 @@
+:root {
+  --ink: #1f2430;
+  --muted: #5b6472;
+  --line: #d7dbe3;
+  --bg: #f6f7f9;
+  --card: #ffffff;
+  --brand: #2f5bd7;
+  --ok: #1f7a4d;
+  --warn: #a2601b;
+  --bad: #b3352b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 2rem 1rem 4rem;
+  font: 15px/1.6 "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+header.m2, main.m2 { max-width: 960px; margin: 0 auto; }
+
+header.m2 h1 { font-size: 1.35rem; margin: 0 0 .25rem; }
+header.m2 p { margin: 0 0 1.25rem; color: var(--muted); font-size: .92rem; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.card h2 { font-size: 1.05rem; margin: 0 0 1rem; }
+
+label { display: block; margin-bottom: .75rem; font-size: .9rem; }
+label span { display: block; color: var(--muted); margin-bottom: .25rem; }
+
+input, select, textarea {
+  width: 100%;
+  padding: .5rem .6rem;
+  font: inherit;
+  color: inherit;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.row { display: flex; gap: .75rem; flex-wrap: wrap; }
+.row > label { flex: 1 1 12rem; }
+
+button {
+  font: inherit;
+  padding: .5rem 1rem;
+  border: 1px solid var(--brand);
+  border-radius: 6px;
+  background: var(--brand);
+  color: #fff;
+  cursor: pointer;
+}
+
+button.ghost { background: #fff; color: var(--brand); }
+button.danger { border-color: var(--bad); background: var(--bad); }
+button:disabled { opacity: .55; cursor: not-allowed; }
+
+.hint { color: var(--muted); font-size: .85rem; }
+.feedback { min-height: 1.5rem; font-size: .9rem; }
+.feedback[data-kind="ok"] { color: var(--ok); }
+.feedback[data-kind="bad"] { color: var(--bad); }
+.feedback[data-kind="warn"] { color: var(--warn); }
+
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th, td { text-align: left; padding: .45rem .5rem; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 600; }
+
+.badge {
+  display: inline-block;
+  padding: .05rem .45rem;
+  border-radius: 999px;
+  font-size: .78rem;
+  border: 1px solid var(--line);
+  background: #f2f4f8;
+}
+.badge[data-status="APPROVED"] { border-color: var(--ok); color: var(--ok); }
+.badge[data-status="REJECTED"] { border-color: var(--bad); color: var(--bad); }
+.badge[data-status="PENDING_L1"] { border-color: var(--warn); color: var(--warn); }

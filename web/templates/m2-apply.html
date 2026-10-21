@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>提交借用申请 · 校园资源服务平台</title>
+  <link rel="stylesheet" href="/assets/m2.css">
+</head>
+<body data-page="apply">
+  <header class="m2">
+    <h1>整教室借用申请</h1>
+    <p>单次 1–4 小时、按整点提交；待一级审批。 <a href="/m2/login">切换账号</a> · <a href="/m2/approve">审批台</a></p>
+  </header>
+  <main class="m2">
+    <section class="card">
+      <h2>新建申请</h2>
+      <form id="apply-form" novalidate>
+        <label>
+          <span>教室</span>
+          <select id="room-select" name="room" required></select>
+        </label>
+        <div class="row">
+          <label>
+            <span>日期</span>
+            <input name="date" type="date" required>
+          </label>
+          <label>
+            <span>开始整点（本地时间）</span>
+            <select name="hour" required>
+              <option value="8">08:00</option>
+              <option value="9" selected>09:00</option>
+              <option value="10">10:00</option>
+              <option value="11">11:00</option>
+              <option value="12">12:00</option>
+              <option value="13">13:00</option>
+              <option value="14">14:00</option>
+              <option value="15">15:00</option>
+              <option value="16">16:00</option>
+              <option value="17">17:00</option>
+              <option value="18">18:00</option>
+              <option value="19">19:00</option>
+              <option value="20">20:00</option>
+              <option value="21">21:00</option>
+            </select>
+          </label>
+          <label>
+            <span>时长（小时）</span>
+            <select name="hours" required>
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </label>
+        </div>
+        <div class="row">
+          <label>
+            <span>用途</span>
+            <input name="purpose" maxlength="200" placeholder="如：ACM 集训讨论" required>
+          </label>
+          <label>
+            <span>参加人数</span>
+            <input name="attendees" type="number" min="1" value="20" required>
+          </label>
+        </div>
+        <button type="submit">提交申请</button>
+      </form>
+      <p id="apply-feedback" class="feedback" role="status"></p>
+    </section>
+    <section class="card">
+      <h2>我的申请</h2>
+      <table id="mine-table">
+        <thead><tr><th>教室</th><th>时段（本地）</th><th>用途</th><th>状态</th><th>审批意见</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+  <script src="/assets/m2.js"></script>
+</body>
+</html>

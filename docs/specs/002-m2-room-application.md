@@ -100,4 +100,6 @@ CREATE INDEX room_application_applicant ON room_application (applicant_id);
 - 并发：`create_application` 与 `decide_application` 都在 `BEGIN IMMEDIATE` 事务内先查后写；状态更新带 `WHERE status = 'PENDING_L1'` 并以 `rowcount` 检测被抢先处理的情况，返回 `409`。
 - 与计划的差异：①驳回归还时把「无备注允许」收紧为 `422`；②「自己不能批自己」写成显式 `409` 并加测试（演示账号默认不同时持两项权限，测试在临时库补授权后验证该分支）。
 - 未实现（按 Review 1 范围延期）：二级审批、申请人撤销、超时撤销、M2 占用/释放 M1 座位、审计写入。
-- 待人工：页面侧用 curl/浏览器走查一遍；`decided_by` 展示名依赖种子账号。
+- 页面：`/m2/login`、`/m2/apply`、`/m2/approve` 三个静态页 + `/assets/m2.js`、`/assets/m2.css`，全部通过公开 JSON 接口读写。
+- 本机 `uvicorn --port 8123` + `curl` 冒烟（2026-10-21）：teacher01 登录 200 → 提交 201 `PENDING_L1`（`09:00+08:00` 存为 `01:00Z`）→ student01 提交 `403 forbidden` → approver01 待审列表可见 → approve 200 `APPROVED` → 重复 approve `409 conflict`。页面与静态资源均 200。
+- 待人工：浏览器里点一遍三个页面的交互；`decided_by` 展示名依赖种子账号。

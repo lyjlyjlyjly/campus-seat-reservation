@@ -7,7 +7,10 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query, Request
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field, field_validator
+
+from app.common.config import PROJECT_ROOT
 
 from app.d.auth.dependencies import current_user, require_permission
 from app.d.auth.errors import api_error
@@ -16,6 +19,8 @@ from app.m2 import applications
 from app.m2.times import InvalidPeriod, parse_period
 
 router = APIRouter()
+
+_TEMPLATES = PROJECT_ROOT / "web" / "templates"
 
 APPLY_PERMISSION = "room:apply"
 APPROVE_PERMISSION = "room:approve"
@@ -48,6 +53,22 @@ class DecisionCreate(BaseModel):
 
 def _rejected(error: applications.ApplicationRejected) -> Exception:
     return api_error(error.status_code, error.message, error.code)
+
+
+@router.get("/login", include_in_schema=False)
+def login_page() -> FileResponse:
+    """登录页公开可访问；页面本身不渲染任何用户数据。"""
+    return FileResponse(_TEMPLATES / "m2-login.html")
+
+
+@router.get("/apply", include_in_schema=False)
+def apply_page() -> FileResponse:
+    return FileResponse(_TEMPLATES / "m2-apply.html")
+
+
+@router.get("/approve", include_in_schema=False)
+def approve_page() -> FileResponse:
+    return FileResponse(_TEMPLATES / "m2-approve.html")
 
 
 @router.get("/rooms", tags=["M2 教室借用"])
