@@ -5,7 +5,7 @@
 ## 开始任务
 
 1. 先读本文件、[需求基线](docs/requirements.md)、[架构](docs/architecture.md) 和相关 `docs/specs/`；检查 `git status`，保留已有改动。
-2. 本轮范围以 [Review 1 计划](docs/Review1计划.md) 为准；[PJ 计划书](docs/PJ-计划书.md) 提供长期要求。任务书硬性要求不会因本轮延期而消失。
+2. 当前需求范围与状态以 [需求基线](docs/requirements.md) 为准；[PJ 计划书](docs/PJ-计划书.md) 提供长期要求。任务书硬性要求不会因本轮延期而消失。
 3. 将任务范围、约束、至少两个候选方案、预计文件和 Given–When–Then 验收写入 `docs/specs/<issue>.md`。没有 Issue 时使用明确的本地任务编号，不编造 Issue 链接。
 4. 人确认方案后实施；会话中已有的明确实施授权可作为该任务授权并记入 spec，不为同一范围重复请求确认。遇到范围扩张、新增依赖或公共业务契约变化，先说明影响并取得相关负责人同意。
 

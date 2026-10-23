@@ -1,6 +1,6 @@
 # CI 规范与本地检查
 
-本轮以 [Review 1 计划](Review1计划.md) 为范围，只有一个 `check` job。配置在 [.github/workflows/ci.yml](../.github/workflows/ci.yml)，本地与 CI 共用 [scripts/ci.py](../scripts/ci.py)。当前没有部署 job、服务器凭据或发布操作。
+当前工作流只有一个 `check` job。配置在 [.github/workflows/ci.yml](../.github/workflows/ci.yml)，本地与 CI 共用 [scripts/ci.py](../scripts/ci.py)。当前没有部署 job、服务器凭据或发布操作。
 
 ## 触发和执行
 

@@ -4,7 +4,7 @@ Status: implemented — 依据用户明确指令设为项目协作规则
 
 Date: 2026-10-23
 Owner: 项目负责人
-References: [任务规格](../../../../docs/specs/001-module-scoped-git.md)、[Review 1 计划](../../../../docs/Review1计划.md)、[现有分工](../../../../docs/architecture.md)
+References: [任务规格](../../../../docs/specs/001-module-scoped-git.md)、[需求基线](../../../../docs/requirements.md)、[现有分工](../../../../docs/architecture.md)
 Decision record: 用户于 2026-10-23 明确要求按模块逐次 git push，并遵守 Conventional Commits。
 
 ## Problem
