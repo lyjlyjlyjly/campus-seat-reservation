@@ -6,7 +6,7 @@
 
 | 项目 | 约定 |
 |---|---|
-| 自动触发 | 指向 main 的 Pull Request；main 的 push |
+| 自动触发 | 所有分支的 push；指向 main 的 Pull Request |
 | 手动触发 | workflow_dispatch，只运行检查 |
 | 环境 | GitHub 托管 Ubuntu 24.04，Python 3.10 |
 | 权限 | contents: read；checkout 不保留凭据 |
@@ -15,11 +15,16 @@
 | 同一分支多次提交 | 新运行取消旧运行；10 分钟超时 |
 | 通过条件 | 所有步骤退出码为 0，没有 continue-on-error 或允许失败的测试 |
 
+每个 clone 安装 `.githooks/pre-push`；hook 能看到一次本地 `git push` 的全部 ref，并拒绝多个非删除 ref。GitHub 为每个更新的 ref 单独触发 push event，CI 检查该 ref 的提交范围、分支和 Conventional Commit；PR CI 检查累计范围、分支、PR 标题和全部提交。GitHub push event 不提供同一条本地命令更新的其他 ref，因此多 ref 检查由本地 hook 完成。CI 检查使用 push event 的 `before/after` 或 PR event 的 `base/head`。checkout 获取完整历史，用于读取提交路径与基线。
+
+本地 hook 需在每个 clone 安装，且可通过 `git push --no-verify` 跳过。GitHub Actions 会在 ref 更新后报告 push 检查结果；只有仓库负责人启用 `main` 的 PR 限制和必需检查，才能据此限制合并。
+
 检查顺序：
 
-1. `python scripts/check_notes.py`：校验决策文档的可机械检查部分。
-2. `python -m compileall -q app scripts tests`：编译 Python，发现语法错误。
-3. `python -m pytest`：执行应用、数据库、Note 校验器以及后续模块的行为测试。
+1. `python scripts/check_git_policy.py`：GitHub event 下检查 push/PR 的责任组、提交格式和分支名；本地 `python scripts/ci.py` 自动检查 `origin/main..HEAD`。直接调用检查器时可显式传入 `--base origin/main --head HEAD`。
+2. `python scripts/check_notes.py`：校验决策文档的可机械检查部分。
+3. `python -m compileall -q app scripts tests`：编译 Python，发现语法错误。
+4. `python -m pytest`：执行应用、数据库、Note 校验器、Git 门禁以及后续模块的行为测试。
 
 统一脚本使用调用它的同一个 Python 解释器，并将工作目录定位到仓库根。任一步失败立即返回非零，不继续后续步骤。依赖安装失败也会让 job 失败。
 
@@ -31,6 +36,7 @@
 |---|---|
 | Note 格式、路径或互链 | `python scripts/check_notes.py` |
 | Note 校验器 | 上一命令及 `python -m pytest tests/test_notes.py` |
+| Conventional Commit / 模块推送门禁 | `python scripts/check_git_policy.py --base origin/main --head HEAD` 及 `python -m pytest tests/test_git_policy.py` |
 | 应用入口、配置、连接 | `python -m pytest tests/test_app.py tests/test_bootstrap.py` |
 | 迁移、种子 | `python -m pytest tests/test_bootstrap.py`，再跑受影响模块测试 |
 | M1/M2/M3/D 业务 | 对应 `tests/<module>/` 中实际存在的测试，覆盖成功/拒绝路径 |
@@ -49,8 +55,8 @@ Note 检查器验证格式、必需章节、日期/编号/状态、仓库内链�
 
 ## GitHub 上还需配置的事项
 
-工作流文件提交并推送后才会在 GitHub 运行。本次本地检查结果不能写成远端 Actions 已通过。
+本地运行 `python scripts/ci.py` 前先执行 `git fetch origin`，确保 `origin/main` 是最新基线。工作流文件提交并推送后才会在 GitHub 运行。本次本地检查结果不能写成远端 Actions 已通过。
 
-负责人应为 main 配置 PR 合并、必需的 `check` 状态检查和评审；在 GitHub 实际出现工作流结果后选择对应检查名称。公共层、跨组和 schema 改动必须由其他组成员实际评审。先把真实成员账号填入 CODEOWNERS，目前仅有仓库所有者兜底规则，不能替代跨组评审。
+负责人应为 main 配置 PR 合并、必需的 `check` 状态检查和评审；在 GitHub 实际出现工作流结果后选择对应检查名称。此分支推送工作流发现违规后会让检查失败；GitHub Actions 不能拒绝分支 ref 本身，main 的 required check 才能阻止不合规 PR 合入。公共层、跨组和 schema 改动必须由其他组成员实际评审。先把真实成员账号填入 CODEOWNERS，目前仅有仓库所有者兜底规则，不能替代跨组评审。
 
 README、YAML 和 CODEOWNERS 都不能自行开启分支保护。受仓库权限或套餐限制无法配置时，在项目记录中写明限制并执行人工合并检查，不虚构自动门禁。测试环境自动部署、人工生产审批和回滚见 [发布安排](release-process.md)。

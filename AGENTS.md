@@ -61,8 +61,13 @@
 
 ## Git 与交付
 
-- 分支用 `模块/Issue号-简述`，如 `m1/12-reserve-max-hours`；无 Issue 可用 `infra/repository-bootstrap`。一个任务一个小范围 PR。
-- 提交遵循 Conventional Commits，说明需求及原因。默认由人验收后提交；Agent 只在用户明确授权时执行 commit、push、创建远端 Issue 或发布。
+- **强制按模块组推送**：一次 push 只能更新一个分支/ref，业务路径最多涉及一个责任组；全局 `infra` 文件可单独推送或随该组配合。一个 PR 也最多包含一个业务责任组，不能把两个模块分别写成多条提交后塞进一次 push 或一个 PR。G1 对应 M1，G2 对应 M2 和 `app/d/auth/`、`app/d/audit/`，G3 对应 M3 和 `app/d/spaces/`、`database/`、`app/bootstrap.py`。共享 D 根目录是独立范围；全局规则、应用装配和 CI 属于 `infra`。这些目录映射由 [ADR-004](.agents/notes/implemented/process/2026-10-23-adr-004-module-scoped-pushes.md) 维护。
+- 跨组功能先确认接口和依赖，再拆成组内分支、提交、push 和 PR，按依赖顺序推进。一次只推一个组；共享契约或基础设施单独用 `infra` / `d` scope。公共文件可随一个模块组修改，但不能借此同推另一组业务代码。
+- 分支名按责任组使用 `m1/<Issue号>-简述`、`m2/...`、`m3/...`、`d/...` 或 `infra/...`。没有 Issue 时使用本地任务编号，不能编造 Issue。代码通过 PR 合入 `main`，不直接 push 主分支。
+- **提交必须遵循带 scope 的 Conventional Commits**：`<type>(<scope>): <中文描述>`；破坏性变更写 `<type>(<scope>)!: <中文描述>`。type 限定为 `feat`、`fix`、`docs`、`style`、`refactor`、`perf`、`test`、`build`、`ci`、`chore`、`revert`；scope 必须是 `m1`、`m2`、`m3`、`d` 或 `infra`，且与文件归属一致。例如 `feat(m1): 增加座位时段搜索`、`fix(m2): 拒绝无审批权限的请求`、`docs(infra): 说明本地启动方法`。
+- 提交同时修改一个业务组与全局 `infra` 文件时使用业务组 scope；只修改全局基础设施时使用 `infra`，只修改公共 D 根目录时使用 `d`。
+- 每个 clone 执行 `python scripts/install_git_hooks.py` 安装本仓库的 push 前门禁。hook 检查本次新增提交、模块边界、分支名及 Conventional Commit；另有已安装的 hook 配置时先协调，不覆盖。GitHub CI 按每个 push ref 和 PR 检查范围与 Conventional Commit；GitHub 为同一条 `git push` 中的多个 ref 分别触发事件，完整 ref 数量由本地 hook 检查。负责人还须为 `main` 配置 PR 和必需检查，才能阻止失败的 PR 合入。
+- 提交应对应具体任务或需求，说明改动和原因。默认由人验收后提交；Agent 只在用户明确授权时执行 commit、push、创建远端 Issue 或发布。
 - 冲突由人处理；Agent 不执行 merge/rebase 解决冲突，不强推、不改写他人历史、不撤销未知改动。
 - PR 写清改动、实际测试、待办和人工审阅人；保护 `main`、要求 CI 通过及评审属于 GitHub 设置，不能声称写入 YAML 就已开启。
 - 交付说明完成内容、实际验证结果和剩余依赖；AI 的自查不能替代人工验收。完整流程见 [AI 协作说明](docs/ai-collaboration.md)。

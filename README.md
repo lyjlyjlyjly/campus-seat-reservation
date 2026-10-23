@@ -75,6 +75,20 @@ docs/                      需求、架构、任务规格和协作材料
 
 先读 [AGENTS.md](AGENTS.md) 和 [架构及分工](docs/architecture.md)。用 Issue 模板定义任务，在 [specs](docs/specs/README.md) 比较方案，经已有授权或人工确认后实现；提交前由组员审查 diff 和实际验收结果。持久决策使用 [Agent Note 规范](.agents/notes/README.md)，人类入口为 [决策索引](docs/decisions/README.md)。
 
+安装本地的模块 push 检查（每个 clone 一次）：
+
+```powershell
+.\.venv\Scripts\python.exe scripts/install_git_hooks.py
+```
+
+Mac/Linux 在虚拟环境中执行 `python scripts/install_git_hooks.py`。若仓库已有 `core.hooksPath` 或已启用的 Git hook，安装器会停止并保留原配置；由维护者把现有 hook 与 `.githooks/pre-push` 合并后再调整。Windows 维护者新增或修改 hook 时，用 `git add --chmod=+x .githooks/pre-push` 保留 `100755` 可执行模式，确保 Linux/macOS clone 能运行。使用 `git fetch origin` 更新目标分支后，可先手动检查当前改动：
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_git_policy.py --base origin/main --head HEAD
+```
+
+每次 push 只推一个模块组的分支，每个 PR 也最多包含一个模块组。全局 `infra` 变更可独立推送，或随一个模块组配合；共享 D 根目录单独按 `d` 范围推送。分支、提交标题和 PR 标题均要遵守 [单模块推送规则与 Conventional Commit 格式](docs/specs/001-module-scoped-git.md)。共享契约和跨模块功能先拆分为单独的组内 PR；不要在同一次 push 中合并多个模块的实现。
+
 [AI 协作说明](docs/ai-collaboration.md) 规定职责和证据；[工程伦理记录](docs/ethics-log.md) 只记录真实发生的事项；[发布流程](docs/release-process.md) 列出后续交付条件。
 
 仓库内的 CI 文件需提交并推送到 GitHub 才会触发；分支保护、真实组员 CODEOWNERS 映射和服务器环境仍需负责人配置。本轮不部署生产环境，长期任务不会从需求清单中删除。
