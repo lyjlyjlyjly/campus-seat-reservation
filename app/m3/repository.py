@@ -2,6 +2,7 @@
 
 from datetime import datetime, timezone
 from pathlib import Path
+import sqlite3
 
 from app.common.db import connect_database
 
@@ -25,6 +26,22 @@ def create_repair_order(
     类型检查和 strip；分类、长度及外键由真实表约束兜底，不强制转换文本。
     使用独立连接和单个事务，异常回滚并关闭连接，不写其他模块表。
     """
+    with connect_database(database_path) as connection:
+        return insert_repair_order(
+            connection, reporter_id=reporter_id, room_id=room_id,
+            fault_type=fault_type, description=description,
+        )
+
+
+def insert_repair_order(
+    connection: sqlite3.Connection,
+    *,
+    reporter_id: int,
+    room_id: int,
+    fault_type: str,
+    description: str,
+) -> int:
+    """在调用方连接中写入；不提交/关闭，事务与权限由调用方管理。"""
     _positive_id(reporter_id, "reporter_id")
     _positive_id(room_id, "room_id")
     if not isinstance(fault_type, str):
@@ -32,16 +49,14 @@ def create_repair_order(
     if not isinstance(description, str):
         raise ValueError("description 必须为字符串")
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    with connect_database(database_path) as connection:
-        cursor = connection.execute(
-            """INSERT INTO repair_order (
-                reporter_id, room_id, fault_type, description, status,
-                created_at, updated_at
-            ) VALUES (?, ?, ?, ?, 'REPORTED', ?, ?)""",
-            (reporter_id, room_id, fault_type.strip(), description.strip(), timestamp, timestamp),
-        )
-        order_id = cursor.lastrowid
-    return order_id
+    cursor = connection.execute(
+        """INSERT INTO repair_order (
+            reporter_id, room_id, fault_type, description, status,
+            created_at, updated_at
+        ) VALUES (?, ?, ?, ?, 'REPORTED', ?, ?)""",
+        (reporter_id, room_id, fault_type.strip(), description.strip(), timestamp, timestamp),
+    )
+    return cursor.lastrowid
 
 
 def get_repair_order(database_path: Path, order_id: int) -> dict[str, object] | None:
