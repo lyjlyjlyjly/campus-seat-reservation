@@ -2,8 +2,20 @@
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from app.m3.errors import ReportError
+
 
 CATEGORIES = ("ELECTRICAL", "WATER", "FURNITURE", "OTHER")
+
+
+def parse_order_id(value: str) -> int | None:
+    """路径十进制正整数；超出 SQLite 范围返回 None，不执行危险的大整数转换。"""
+    if not value.isascii() or not value.isdecimal() or not value.strip("0"):
+        raise ReportError(422, "invalid_request", "order_id 必须为十进制正整数")
+    digits = value.lstrip("0")
+    if len(digits) > 19 or (len(digits) == 19 and digits > "9223372036854775807"):
+        return None
+    return int(digits)
 
 
 class ReportCreate(BaseModel):
