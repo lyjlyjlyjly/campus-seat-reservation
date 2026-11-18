@@ -113,6 +113,37 @@ def list_dispatch_orders(connection: sqlite3.Connection, status: str) -> list[di
     return [dict(row) | {"detail_url": f"/m3/orders/{row['id']}"} for row in rows]
 
 
+def list_assigned_orders(connection: sqlite3.Connection, user_id: int, status: str | None) -> list[dict]:
+    """固定 SQL 本人范围；状态过滤不改变受理人条件。"""
+    sql = """SELECT o.id, o.room_id, r.name AS room_name, o.fault_type, o.status,
+                    o.created_at, o.assigned_at, o.started_at, o.updated_at
+             FROM repair_order AS o JOIN room AS r ON r.id = o.room_id
+             WHERE o.assigned_to = ?"""
+    parameters = (user_id,)
+    if status is not None:
+        sql += " AND o.status = ?"
+        parameters += (status,)
+    return [dict(row) for row in connection.execute(sql + " ORDER BY o.created_at DESC, o.id DESC", parameters)]
+
+
+def find_start_target(connection: sqlite3.Connection, order_id: int) -> dict | None:
+    """只供已通过 start 功能授权的服务做对象/状态判断，不授予正文读取权。"""
+    row = connection.execute(
+        "SELECT id, status, assigned_to FROM repair_order WHERE id = ?", (order_id,),
+    ).fetchone()
+    return dict(row) if row is not None else None
+
+
+def start_assigned_order(connection: sqlite3.Connection, order_id: int, user_id: int) -> int:
+    """由调用者管理事务；本人、ASSIGNED 条件防止重复覆盖首次开始时间。"""
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return connection.execute(
+        """UPDATE repair_order SET status='IN_REPAIR', started_at=?, updated_at=?
+           WHERE id=? AND status='ASSIGNED' AND assigned_to=?""",
+        (timestamp, timestamp, order_id, user_id),
+    ).rowcount
+
+
 def eligible_repairers(connection: sqlite3.Connection, user_id: int | None = None) -> list[dict]:
     """候选/写事务共用资格条件；角色与权限分别检查，允许合法多角色组合。"""
     if user_id is not None and user_id > 9223372036854775807:

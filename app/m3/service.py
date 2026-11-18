@@ -8,7 +8,8 @@ from app.m3.errors import ReportError
 from app.m3.models import AssignmentCreate, ORDER_STATES, ReportCreate, parse_order_id
 from app.m3.repository import (
     assign_reported_order, eligible_repairers, find_visible_order, insert_repair_order,
-    list_dispatch_orders, list_owned_orders,
+    list_dispatch_orders, list_owned_orders, list_assigned_orders, find_start_target,
+    start_assigned_order,
 )
 
 
@@ -129,6 +130,49 @@ def read_order(database_path: Path, user_id: int, raw_order_id: str) -> dict:
 def _require_dispatcher(connection: sqlite3.Connection, user_id: int) -> None:
     _require_active_user(connection, user_id)
     _require_permission(_permissions_for(connection, user_id), "repair:assign")
+
+
+def assigned_orders(database_path: Path, user_id: int, status: str | None) -> dict:
+    _database_ready(database_path)
+    with connect_database(database_path, read_only=True) as connection:
+        connection.execute("BEGIN")
+        _schema_ready(connection)
+        _require_active_user(connection, user_id)
+        permissions = _permissions_for(connection, user_id)
+        _require_permission(permissions, "repair:read_assigned")
+        if status is not None and status not in ("ASSIGNED", "IN_REPAIR"):
+            raise ReportError(422, "invalid_request", "status 仅允许 ASSIGNED 或 IN_REPAIR，查询全部时请省略")
+        items = list_assigned_orders(connection, user_id, status)
+        for item in items:
+            item["can_start"] = "repair:start" in permissions and item["status"] == "ASSIGNED"
+        return {"items": items, "total": len(items)}
+
+
+def start_repair(database_path: Path, user_id: int, raw_order_id: str) -> dict:
+    _database_ready(database_path)
+    with connect_database(database_path) as connection:
+        connection.execute("BEGIN IMMEDIATE")
+        _schema_ready(connection)
+        _require_active_user(connection, user_id)
+        _require_permission(_permissions_for(connection, user_id), "repair:start")
+        order_id = parse_order_id(raw_order_id)
+        item = None if order_id is None else find_start_target(connection, order_id)
+        if item is None:
+            raise ReportError(404, "not_found", "工单不存在或不可访问")
+        if item["assigned_to"] != user_id:
+            raise ReportError(403, "forbidden", "只有实际受理人可以开始维修")
+        # 后续可在此复用通用状态规则；对象授权必须在前，事务/条件更新仍保留。
+        if item["status"] != "ASSIGNED":
+            raise ReportError(409, "conflict", "工单状态已变化，仅已派单工单可以开始维修，请重新查询")
+        if start_assigned_order(connection, order_id, user_id) != 1:
+            raise ReportError(409, "conflict", "工单状态已变化，本次未开始维修，请重新查询")
+        summary = connection.execute(
+            "SELECT id, status, started_at, updated_at FROM repair_order WHERE id = ?", (order_id,),
+        ).fetchone()
+        if summary is None:
+            raise RuntimeError("开始维修后无法读取状态")
+        result = dict(summary)
+    return result  # 必须完成 COMMIT；不经详情接口，不隐式授予正文读取权。
 
 
 def dispatch_queue(database_path: Path, user_id: int, status: str) -> dict:
