@@ -6,11 +6,12 @@
   <title>工单详情 · 校园资源服务平台</title>
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/assets/m3/orders.css">
+  <script src="/assets/m3/time.js" defer></script>
   <script src="/assets/m3/orders.js" defer></script>
 </head>
 <body>
   <main id="orders-page" class="page m3-orders" data-mode="detail" data-order-id="{{ORDER_ID}}" data-login-available="{{LOGIN_AVAILABLE}}">
-    <nav aria-label="报修导航"><a href="/m3/my-orders">我的工单</a><a href="/m3/report">新建房间报修</a></nav>
+    <nav aria-label="报修导航"><a href="/m3/my-orders">我的工单</a><a href="/m3/report">新建房间报修</a><a href="/m3/dispatch">管理派单</a></nav>
     <p class="eyebrow">M3 · 物业报修</p>
     <h1>工单详情</h1>
     <p class="intro">查看报修内容与已有处理时间，所有时间均以北京时间显示。</p>
@@ -21,7 +22,7 @@
       <noscript><p>请启用 JavaScript 以读取工单。</p></noscript>
       <div id="orders-content"></div>
     </section>
-    <footer><p>当前页面仅提供查询，不提供派单或维修操作。</p></footer>
+    <footer><p>当前页面仅提供查询；有派单权限者可使用“管理派单”。开始维修另批实现。</p></footer>
   </main>
 </body>
 </html>

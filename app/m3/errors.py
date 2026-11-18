@@ -24,11 +24,17 @@ def error_response(status: int, code: str, message: str) -> JSONResponse:
     return JSONResponse(status_code=status, content={"error": code, "message": message})
 
 
-def validation_message(error: RequestValidationError) -> str:
+def validation_message(error: RequestValidationError, *, assignment: bool = False) -> str:
     # 不输出原始输入/任意字段名/异常正文；只显示已知字段与预定原因。
     first = error.errors()[0]
     kind = first["type"]
     field = first["loc"][-1] if first["loc"] else None
+    if assignment:
+        if kind == "extra_forbidden":
+            return "派单请求仅允许 assigned_to，不接受操作者、状态、时间或其他额外字段"
+        if field == "assigned_to":
+            return "assigned_to 必须是严格正整数，不能为布尔值、小数或数字字符串"
+        return "派单请求须为 JSON 对象，并且仅包含 assigned_to 严格正整数"
     if kind == "extra_forbidden":
         return "请求仅允许 room_id、fault_type、description，不接受身份、状态或其他额外字段"
     if field == "room_id":
@@ -43,6 +49,7 @@ def validation_message(error: RequestValidationError) -> str:
 class M3Route(APIRoute):
     def get_route_handler(self):
         original = super().get_route_handler()
+        assignment = self.path.endswith("/work-orders/{order_id}/assign")
 
         async def handle(request):
             try:
@@ -50,7 +57,7 @@ class M3Route(APIRoute):
             except ReportError as error:
                 return error_response(error.status_code, error.code, error.message)
             except RequestValidationError as error:
-                return error_response(422, "invalid_request", validation_message(error))
+                return error_response(422, "invalid_request", validation_message(error, assignment=assignment))
             except HTTPException as error:
                 # G2 的 HTTPException 在此局部适配，优先于共享的全局 handler。
                 messages = {

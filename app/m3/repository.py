@@ -101,3 +101,43 @@ def find_visible_order(
         (order_id, allow_management, allow_own, user_id, allow_assigned, user_id),
     ).fetchone()
     return dict(row) if row is not None else None
+
+
+def list_dispatch_orders(connection: sqlite3.Connection, status: str) -> list[dict]:
+    rows = connection.execute(
+        """SELECT o.id, o.room_id, r.name AS room_name, o.fault_type, o.status,
+                  o.created_at, o.assigned_to, o.assigned_at
+           FROM repair_order AS o JOIN room AS r ON r.id = o.room_id
+           WHERE o.status = ? ORDER BY o.created_at DESC, o.id DESC""", (status,),
+    )
+    return [dict(row) | {"detail_url": f"/m3/orders/{row['id']}"} for row in rows]
+
+
+def eligible_repairers(connection: sqlite3.Connection, user_id: int | None = None) -> list[dict]:
+    """候选/写事务共用资格条件；角色与权限分别检查，允许合法多角色组合。"""
+    if user_id is not None and user_id > 9223372036854775807:
+        return []
+    sql = """SELECT u.id, u.display_name FROM app_user AS u
+             WHERE u.status = 'ACTIVE'
+             AND EXISTS (SELECT 1 FROM user_role AS ur JOIN role AS r ON r.id = ur.role_id
+                         WHERE ur.user_id = u.id AND r.code = 'repairer')
+             AND EXISTS (SELECT 1 FROM user_role AS ur
+                         JOIN role_permission AS rp ON rp.role_id = ur.role_id
+                         JOIN permission AS p ON p.id = rp.permission_id
+                         WHERE ur.user_id = u.id AND p.code = 'repair:start')"""
+    parameters = ()
+    if user_id is not None:
+        sql += " AND u.id = ?"
+        parameters = (user_id,)
+    return [dict(row) for row in connection.execute(sql + " ORDER BY u.display_name, u.id", parameters)]
+
+
+def assign_reported_order(connection: sqlite3.Connection, order_id: int, assigned_to: int, assigned_by: int) -> int:
+    """调用者负责事务/授权；条件更新防止覆盖，时间由服务端统一生成。"""
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return connection.execute(
+        """UPDATE repair_order SET status='ASSIGNED', assigned_to=?, assigned_by=?,
+                  assigned_at=?, updated_at=?, started_at=NULL
+           WHERE id=? AND status='REPORTED'""",
+        (assigned_to, assigned_by, timestamp, timestamp, order_id),
+    ).rowcount
