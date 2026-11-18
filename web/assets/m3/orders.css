@@ -1,0 +1,18 @@
+.m3-orders { max-width: 900px; padding-top: 32px; }
+.m3-orders .eyebrow { margin-top: 32px; }
+.m3-orders .module { margin-top: 24px; }
+.m3-orders button { font: inherit; padding: 7px 15px; border: 1px solid #245d84; border-radius: 6px; color: #245d84; background: white; cursor: pointer; }
+.m3-orders button:disabled { opacity: .6; cursor: wait; }
+.m3-orders button:focus-visible { outline: 3px solid #648dae; outline-offset: 3px; }
+.m3-orders .orders-message { padding: 12px 14px; background: #edf3f8; border-radius: 6px; }
+.m3-orders .orders-message[data-kind="error"] { color: #8d271f; }
+.m3-orders .order-list { list-style: none; padding: 0; }
+.m3-orders .order-list li { padding: 20px 0; border-bottom: 1px solid #d9e3eb; }
+.m3-orders .order-list h2 { margin: 0 0 8px; }
+.m3-orders .order-list p { margin: 6px 0; }
+.m3-orders dl { display: grid; grid-template-columns: 7em minmax(0, 1fr); gap: 12px 16px; margin-top: 24px; }
+.m3-orders dt { font-weight: 600; color: #4c6172; }
+.m3-orders dd { margin: 0; overflow-wrap: anywhere; }
+.m3-orders .order-description { white-space: pre-wrap; }
+.m3-orders [hidden] { display: none; }
+@media (max-width: 520px) { .m3-orders dl { grid-template-columns: 1fr; gap: 4px; } .m3-orders dd { margin-bottom: 12px; } }

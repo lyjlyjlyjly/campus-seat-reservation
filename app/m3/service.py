@@ -5,8 +5,8 @@ import sqlite3
 
 from app.common.db import connect_database
 from app.m3.errors import ReportError
-from app.m3.models import ReportCreate
-from app.m3.repository import insert_repair_order
+from app.m3.models import ReportCreate, parse_order_id
+from app.m3.repository import find_visible_order, insert_repair_order, list_owned_orders
 
 
 def _database_ready(database_path: Path) -> None:
@@ -21,19 +21,30 @@ def _schema_ready(connection: sqlite3.Connection) -> None:
         raise ReportError(503, "schema_unavailable", "报修所需迁移尚未接入，当前暂不可提交")
 
 
-def _require_reporter(connection: sqlite3.Connection, reporter_id: int) -> None:
-    row = connection.execute("SELECT status FROM app_user WHERE id = ?", (reporter_id,)).fetchone()
+def _require_active_user(connection: sqlite3.Connection, user_id: int) -> None:
+    row = connection.execute("SELECT status FROM app_user WHERE id = ?", (user_id,)).fetchone()
     if row is None or row["status"] != "ACTIVE":
         raise ReportError(401, "unauthenticated", "账号已失效或被禁用，请重新登录")
-    permission = connection.execute(
-        """SELECT 1 FROM user_role AS ur
+
+
+def _permissions_for(connection: sqlite3.Connection, user_id: int) -> set[str]:
+    return {row["code"] for row in connection.execute(
+        """SELECT DISTINCT p.code FROM user_role AS ur
            JOIN role_permission AS rp ON rp.role_id = ur.role_id
            JOIN permission AS p ON p.id = rp.permission_id
-           WHERE ur.user_id = ? AND p.code = 'repair:report' LIMIT 1""",
-        (reporter_id,),
-    ).fetchone()
-    if permission is None:
-        raise ReportError(403, "forbidden", "当前账号没有 repair:report 报修权限")
+           WHERE ur.user_id = ?""", (user_id,),
+    )}
+
+
+def _require_permission(permissions: set[str], code: str) -> None:
+    if code not in permissions:
+        raise ReportError(403, "forbidden", f"当前账号没有 {code} 权限")
+
+
+def _require_reporter(connection: sqlite3.Connection, reporter_id: int) -> None:
+    # 保留创建/房间候选的调用入口；读取工单不复用 repair:report 要求。
+    _require_active_user(connection, reporter_id)
+    _require_permission(_permissions_for(connection, reporter_id), "repair:report")
 
 
 def reportable_rooms(connection: sqlite3.Connection, room_id: int | None = None) -> list[dict]:
@@ -75,3 +86,36 @@ def create_report(database_path: Path, reporter_id: int, payload: ReportCreate) 
         ).fetchone())
     # 上面的上下文已成功 COMMIT；失败包括提交阶段的锁冲突会回滚并抛出。
     return item
+
+
+def list_my_orders(database_path: Path, user_id: int) -> dict:
+    _database_ready(database_path)
+    with connect_database(database_path, read_only=True) as connection:
+        connection.execute("BEGIN")
+        _schema_ready(connection)
+        _require_active_user(connection, user_id)
+        _require_permission(_permissions_for(connection, user_id), "repair:read_own")
+        items = list_owned_orders(connection, user_id)
+        return {"items": items, "total": len(items)}
+
+
+def read_order(database_path: Path, user_id: int, raw_order_id: str) -> dict:
+    _database_ready(database_path)
+    with connect_database(database_path, read_only=True) as connection:
+        connection.execute("BEGIN")
+        _schema_ready(connection)
+        _require_active_user(connection, user_id)
+        permissions = _permissions_for(connection, user_id)
+        if not permissions.intersection({"repair:read_own", "repair:read_assigned", "repair:assign"}):
+            raise ReportError(403, "forbidden", "当前账号没有工单查看权限")
+        # 先验证功能权限，再解析/查询目标；不按目标存在性改变 403。
+        order_id = parse_order_id(raw_order_id)
+        item = None if order_id is None else find_visible_order(
+            connection, order_id, user_id=user_id,
+            allow_management="repair:assign" in permissions,
+            allow_own="repair:read_own" in permissions,
+            allow_assigned="repair:read_assigned" in permissions,
+        )
+        if item is None:
+            raise ReportError(404, "not_found", "工单不存在或不可访问")
+        return item
