@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>我受理的工单 · 校园资源服务平台</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/assets/m3/orders.css">
+  <script src="/assets/m3/time.js" defer></script>
+  <script src="/assets/m3/assigned.js" defer></script>
+</head>
+<body>
+  <main id="assigned-page" class="page m3-orders" data-login-available="{{LOGIN_AVAILABLE}}">
+    <nav aria-label="报修导航"><a href="/m3/report">新建房间报修</a><a href="/m3/my-orders">我的工单</a><a href="/m3/dispatch">管理派单</a></nav>
+    <p class="eyebrow">M3 · 物业报修</p>
+    <h1>我受理的工单</h1>
+    <p class="intro">这里只显示实际指派给本人的房间工单。开始维修需要单独授权，按钮显示不代表提交时一定可操作。</p>
+    <p id="assigned-message" class="orders-message" role="status" aria-live="polite">正在加载本人受理工单…</p>
+    <a id="assigned-login" href="/m2/login" hidden>前往登录</a>
+    <section class="module" aria-label="本人受理列表">
+      <label for="assigned-status">工单状态</label>
+      <select id="assigned-status"><option value="">全部</option><option value="ASSIGNED">已派单</option><option value="IN_REPAIR">维修中</option></select>
+      <button id="reload-assigned" type="button">重新查询</button>
+      <div id="assigned-content"></div>
+      <noscript><p>请启用 JavaScript 以读取工单；未启用时不提供操作按钮。</p></noscript>
+    </section>
+    <footer><p>时间均为北京时间。操作结果不明时请重新查询核实，不要重复发送开始请求。本页不提供完工、验收或退回操作。</p></footer>
+  </main>
+</body>
+</html>

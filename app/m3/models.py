@@ -9,6 +9,11 @@ CATEGORIES = ("ELECTRICAL", "WATER", "FURNITURE", "OTHER")
 ORDER_STATES = ("REPORTED", "ASSIGNED", "IN_REPAIR")
 
 
+class RepairStart(BaseModel):
+    """必填空 JSON 对象；没有客户端可以指定的状态或身份字段。"""
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+
 class AssignmentCreate(BaseModel):
     model_config = ConfigDict(strict=True, extra="forbid")
 
