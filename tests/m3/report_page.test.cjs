@@ -13,7 +13,7 @@ class Element {
   replaceChildren() { this.children = []; this.value = ''; }
 }
 function fixture(fetcher, loginAvailable = false) {
-  const ids = ['report-form','report-fields','room-id','fault-type','description','description-count','submit-report','reload-rooms','report-login','report-message'];
+  const ids = ['report-form','report-fields','room-id','fault-type','description','description-count','submit-report','reload-rooms','report-login','report-message','created-order-link'];
   const elements = Object.fromEntries(ids.map(id => [id, new Element()]));
   elements['report-form'].dataset.loginAvailable = String(loginAvailable);
   elements['report-form'].reportValidity = () => !elements.description.validation;
@@ -51,6 +51,8 @@ test('loads real API shape, shows inactive label, disables pending submit, rende
   resolvePost(response(201, {id:41, status:'REPORTED', created_at:'2026-11-18T09:00:00Z'}));
   await pending;
   assert.match(f.elements['report-message'].textContent, /#41.*REPORTED/);
+  assert.equal(f.elements['created-order-link'].href, '/m3/orders/41');
+  assert.equal(f.elements['created-order-link'].hidden, false);
   assert.equal(f.elements.description.value, '💡'.repeat(1000));
 });
 
@@ -87,6 +89,9 @@ test('network rejection or unreadable POST result blocks resubmission without au
     assert.equal(f.elements.description.value, '保留的描述');
     assert.equal(f.elements['submit-report'].disabled, true);
     assert.equal(f.elements['reload-rooms'].disabled, true);
+    assert.equal(f.elements['created-order-link'].hidden, true);
+    assert.equal(f.elements['created-order-link'].href, undefined);
+    assert.match(f.elements['report-message'].textContent, /我的工单.*不能直接认领最新工单/);
   }
 });
 

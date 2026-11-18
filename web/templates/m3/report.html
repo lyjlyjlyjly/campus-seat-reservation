@@ -10,13 +10,14 @@
 </head>
 <body>
   <main class="page m3-report">
-    <nav aria-label="返回"><a href="/">← 返回首页</a></nav>
+    <nav aria-label="报修导航"><a href="/">← 返回首页</a><a href="/m3/my-orders">我的工单</a></nav>
     <p class="eyebrow">M3 · 物业报修</p>
     <h1>告诉我们，哪里需要维修</h1>
     <p class="intro">当前仅支持房间报修。请选择房间并描述故障，帮助维修人员了解现场情况。</p>
     <section class="module" aria-labelledby="form-heading">
       <h2 id="form-heading">新建房间报修</h2>
       <p id="report-message" class="report-message" role="status" aria-live="polite">正在检查报修服务并加载房间…</p>
+      <a id="created-order-link" hidden>查看本次工单详情</a>
       <a id="report-login" href="/m2/login" hidden>前往登录</a>
       <button id="reload-rooms" type="button" class="secondary">重新加载房间</button>
       <noscript><p>提交报修需要启用 JavaScript；未启用时表单保持禁用。</p></noscript>

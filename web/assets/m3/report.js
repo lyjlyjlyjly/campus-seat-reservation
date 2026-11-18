@@ -12,6 +12,7 @@
     const room = byId("room-id"), category = byId("fault-type"), description = byId("description");
     const count = byId("description-count"), submit = byId("submit-report");
     const reload = byId("reload-rooms"), login = byId("report-login"), message = byId("report-message");
+    const detailLink = byId("created-order-link");
     let ready = false, pending = false, uncertain = false, completed = false;
     const say = (text, kind = "error") => { message.textContent = text; message.dataset.kind = kind; };
     const sync = () => {
@@ -69,7 +70,7 @@
     }
     function unknownResult() {
       uncertain = true;
-      say("提交结果不明，工单可能已经生成。输入已保留；请联系工作人员核实，请勿刷新后重复提交。本接口不保证重复请求只创建一次。");
+      say("提交结果不明，工单可能已经生成。输入已保留；请联系工作人员核实，请勿刷新后重复提交。可前往“我的工单”核对描述和时间，不能直接认领最新工单。本接口不保证重复请求只创建一次。");
     }
     async function send(event) {
       event.preventDefault();
@@ -90,6 +91,8 @@
         const data = await response.json();
         if (response.status === 201 && Number.isSafeInteger(data.id) && data.status === "REPORTED" && typeof data.created_at === "string") {
           completed = true;
+          detailLink.href = `/m3/orders/${data.id}`;
+          detailLink.hidden = false;
           say(`报修成功！工单编号 #${data.id}，状态 REPORTED（已报修）。创建时间：${data.created_at}`, "success");
         } else if (!response.ok && typeof data.error === "string" && typeof data.message === "string" && response.status < 500) {
           showError(response, data);
