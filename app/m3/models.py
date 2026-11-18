@@ -6,6 +6,13 @@ from app.m3.errors import ReportError
 
 
 CATEGORIES = ("ELECTRICAL", "WATER", "FURNITURE", "OTHER")
+ORDER_STATES = ("REPORTED", "ASSIGNED", "IN_REPAIR")
+
+
+class AssignmentCreate(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    assigned_to: int = Field(gt=0)
 
 
 def parse_order_id(value: str) -> int | None:

@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse
 from app.common.config import PROJECT_ROOT
 from app.m3.errors import M3Route, ReportError
 from app.m3.identity import authenticated_reporter
-from app.m3.models import ReportCreate, parse_order_id
+from app.m3.models import AssignmentCreate, ReportCreate, parse_order_id
 from app.m3 import service
 
 
@@ -29,6 +29,11 @@ def report_page(request: Request) -> HTMLResponse:
 @router.get("/my-orders", include_in_schema=False, response_class=HTMLResponse)
 def my_orders_page(request: Request) -> HTMLResponse:
     return _page(request, "my-orders.html")
+
+
+@router.get("/dispatch", include_in_schema=False, response_class=HTMLResponse)
+def dispatch_page(request: Request) -> HTMLResponse:
+    return _page(request, "dispatch.html")
 
 
 @router.get("/orders/{order_id}", include_in_schema=False, response_class=HTMLResponse)
@@ -56,7 +61,25 @@ def my_orders(request: Request, reporter_id: int = Depends(authenticated_reporte
     return service.list_my_orders(request.app.state.settings.database_path, reporter_id)
 
 
-# 未来 /work-orders 下的静态路径必须声明在此动态路径之前。
+@router.get("/work-orders/dispatch")
+def dispatch_orders(request: Request, status: str = "REPORTED", reporter_id: int = Depends(authenticated_reporter)) -> dict:
+    return service.dispatch_queue(request.app.state.settings.database_path, reporter_id, status)
+
+
+@router.get("/repairers")
+def repairers(request: Request, reporter_id: int = Depends(authenticated_reporter)) -> dict:
+    return service.list_repairers(request.app.state.settings.database_path, reporter_id)
+
+
+@router.post("/work-orders/{order_id}/assign")
+def assign_work_order(
+    order_id: str, payload: AssignmentCreate, request: Request,
+    reporter_id: int = Depends(authenticated_reporter),
+) -> dict:
+    return service.assign_order(request.app.state.settings.database_path, reporter_id, order_id, payload)
+
+
+# /work-orders 下的静态路径必须声明在此动态路径之前。
 @router.get("/work-orders/{order_id}")
 def order_detail(order_id: str, request: Request, reporter_id: int = Depends(authenticated_reporter)) -> dict:
     return service.read_order(request.app.state.settings.database_path, reporter_id, order_id)
