@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>房间报修 · 校园资源服务平台</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/assets/m3/report.css">
+  <script src="/assets/m3/report.js" defer></script>
+</head>
+<body>
+  <main class="page m3-report">
+    <nav aria-label="返回"><a href="/">← 返回首页</a></nav>
+    <p class="eyebrow">M3 · 物业报修</p>
+    <h1>告诉我们，哪里需要维修</h1>
+    <p class="intro">当前仅支持房间报修。请选择房间并描述故障，帮助维修人员了解现场情况。</p>
+    <section class="module" aria-labelledby="form-heading">
+      <h2 id="form-heading">新建房间报修</h2>
+      <p id="report-message" class="report-message" role="status" aria-live="polite">正在检查报修服务并加载房间…</p>
+      <a id="report-login" href="/m2/login" hidden>前往登录</a>
+      <button id="reload-rooms" type="button" class="secondary">重新加载房间</button>
+      <noscript><p>提交报修需要启用 JavaScript；未启用时表单保持禁用。</p></noscript>
+      <form id="report-form" data-login-available="{{LOGIN_AVAILABLE}}">
+        <fieldset id="report-fields" disabled>
+          <legend class="sr-only">报修信息</legend>
+          <label for="room-id">报修房间</label>
+          <select id="room-id" name="room_id" required aria-describedby="room-help">
+            <option value="">请先加载房间</option>
+          </select>
+          <p class="help" id="room-help">停借房间仍可报修，列表中会标注停借状态。座位报修尚未开放。</p>
+          <label for="fault-type">故障分类</label>
+          <select id="fault-type" name="fault_type" required>
+            <option value="">请选择故障分类</option>
+            <option value="ELECTRICAL">电气故障</option>
+            <option value="WATER">给排水故障</option>
+            <option value="FURNITURE">家具故障</option>
+            <option value="OTHER">其他故障</option>
+          </select>
+          <label for="description">故障描述</label>
+          <textarea id="description" name="description" rows="6" required aria-describedby="description-help description-count" placeholder="例如：教室第一排左侧灯管持续闪烁，上课时影响照明。"></textarea>
+          <p class="help" id="description-help">去除首尾空白后 1–1000 个 Unicode 字符，保留内部空格与换行；不支持 U+0000。</p>
+          <p class="character-count" id="description-count" aria-live="polite">0 / 1000 字符</p>
+          <button id="submit-report" type="submit" disabled>提交报修</button>
+        </fieldset>
+      </form>
+    </section>
+    <footer><p>提交成功后会在本页显示工单编号。网络结果不明时请先核实，避免重复报修。</p></footer>
+  </main>
+</body>
+</html>

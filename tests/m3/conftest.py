@@ -79,3 +79,37 @@ def insert_order():
             tuple(values.values()),
         ).lastrowid
     return insert
+
+
+@pytest.fixture
+def report_database(database):
+    # 仅临时测试库初始化报修权限；不修改正式种子/请求逻辑。
+    with connect_database(database) as connection:
+        connection.execute("INSERT INTO permission (code, description) VALUES ('repair:report', '测试报修权限')")
+        connection.execute(
+            """INSERT INTO role_permission (role_id, permission_id)
+               SELECT r.id, p.id FROM role r, permission p
+               WHERE r.code = 'student' AND p.code = 'repair:report'"""
+        )
+        connection.execute("INSERT INTO user_role SELECT 1, id FROM role WHERE code = 'student'")
+    return database
+
+
+@pytest.fixture
+def report_app(report_database):
+    from app.common.config import Settings
+    from app.main import create_app
+    from app.m3.identity import authenticated_reporter
+
+    application = create_app(Settings(database_path=report_database, version="m3-test"))
+    # 唯一被替换的外部边界；权限和房间仍由真实数据库查询。
+    application.dependency_overrides[authenticated_reporter] = lambda: 1
+    return application
+
+
+@pytest.fixture
+def report_client(report_app):
+    from fastapi.testclient import TestClient
+
+    with TestClient(report_app) as client:
+        yield client
