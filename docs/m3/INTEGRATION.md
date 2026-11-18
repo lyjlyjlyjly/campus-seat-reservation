@@ -1,13 +1,13 @@
 # M3 整合交接（唯一维护入口）
 
-本文件随每个 M3 批次更新；各批 spec 只记录范围、选择及验证并引用这里。当前批次：[M3-LOCAL-007](../specs/M3-LOCAL-007-manual-assignment.md)；查询、创建与持久化基础分别见 [006](../specs/M3-LOCAL-006-order-queries.md)、[005](../specs/M3-LOCAL-005-report-create.md)、[004](../specs/M3-LOCAL-004-persistence.md)。用户已授权模块按可替换的暂定契约独立开发，不再等待 P/G/S/D 全部回复、共享依赖合入或正式迁移编号；**暂定契约不等于团队批准**，公共接入由固定整合人员负责。
+本文件随每个 M3 批次更新；各批 spec 只记录范围、选择及验证并引用这里。当前批次：[M3-LOCAL-008](../specs/M3-LOCAL-008-start-repair.md)；派单、查询、创建与持久化基础分别见 [007](../specs/M3-LOCAL-007-manual-assignment.md)、[006](../specs/M3-LOCAL-006-order-queries.md)、[005](../specs/M3-LOCAL-005-report-create.md)、[004](../specs/M3-LOCAL-004-persistence.md)。用户已授权模块按可替换的暂定契约独立开发，不再等待 P/G/S/D 全部回复、共享依赖合入或正式迁移编号；**暂定契约不等于团队批准**，公共接入由固定整合人员负责。
 
 ## 当前能力与边界
 
-- **模块创建、本人查询及手动派单接口/页面已实现，真实共享登录及公共基线尚未接通。** 2026-11-18 本轮 fetch / GitHub 核实：[PR #4](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/4)、[PR #5](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/5)、[PR #6](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/6) 均未合并，main 为 `d8918bbc`。007 从 006 的 `e1fbd945251cdcc2cdc0a7d4226caa42f70ad8f0` 建立 `m3/local-007-manual-assignment`，现已获按实际模块自动验证结果提交、推送并创建依赖 PR、请求 lyjlyjlyjly 评审的授权；这不代表人工验收通过。人工浏览器验收、真实登录联调、正式迁移/权限初始化及团队评审仍待完成。
-- 依赖顺序为 **#4 → #5 → #6 → 007**：#5 目标是 `m3/local-004-persistence`，#6 目标是 `m3/local-005-report-create`；007 后续发布暂以 `m3/local-006-order-queries` 为目标。逐个将前置 PR 合入 main 后调整后续目标，每次都复核完整差异与 CI。不提前合入依赖分支、不混入整条 M2/infra 历史；依赖原分支不变。
+- **模块创建、本人查询、手动派单、本人受理查询与开始维修接口/页面已实现，真实共享登录及公共基线尚未接通。** 2026-11-18 本轮 fetch / GitHub 核实：[PR #4](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/4)、[PR #5](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/5)、[PR #6](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/6)、[PR #7](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/7) 均未合并，main 为 `d8918bbc`。008 从 007 的 `094f12dfff4f2f827f876ba4afe6f0bf06a16e77` 建立 `m3/local-008-start-repair`，现已获按模块自动验证结果提交、推送、创建独立依赖 PR 并请求 lyjlyjlyjly 评审的授权，实际发布状态以 Git/GitHub 为准。发布授权不代表人工验收通过；浏览器交互、真实登录联调、正式迁移/权限初始化及团队评审仍待完成。
+- 依赖顺序为 **#4 → #5 → #6 → #7 → 008**：#5/#6/#7 的目标依次为 004/005/006 功能分支，008 后续发布暂以 `m3/local-007-manual-assignment` 为目标。逐个将前置 PR 合入 main 后调整后续目标，每次都复核完整差异与 CI。不提前合入依赖分支、不混入整条 M2/infra 历史；依赖原分支不变。
 - [PR #1](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/1) 是基础状态函数，[PR #2](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/2) 是通用文本规范化，[PR #3](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/3) 是整体契约提案；本批未合并、复制或改写这些 PR。正式创建业务接入时复用已经合入的函数。
-- 已有创建、本人列表/详情、管理队列/合法人员候选、手动派单、事务内真实授权及页面反馈；自动业务测试仅替换外部身份边界，仍查询真实临时数据库。没有开始维修、重新派单、座位、评价、超时及 M3→M1。repository 本身不提供完整鉴权，正常路由必须经过身份入口及 service；缺少认证时返回 503，不默认登录。
+- 已有创建、本人列表/详情、管理队列/合法人员候选、手动派单、本人受理列表及 ASSIGNED → IN_REPAIR；自动业务测试仅替换外部身份边界，仍查询真实临时数据库。待验收、完成、退回、重新派单、座位、评价、超时及 M3→M1 仍未实现，不标记 M3-R03 全部完成。repository 本身不提供完整鉴权，正常路由必须经过身份入口及 service；缺少认证时返回 503，不默认登录。
 - 不改默认开发库、公共初始化器、已有 V1、共享种子或其他组业务；本分支默认初始化仍不安装 M3 表。
 
 ## 实际路径与调用约定
@@ -18,11 +18,13 @@
 | [app/m3/repository.py](../../app/m3/repository.py) | 保留 `create_repair_order` / `get_repair_order` 独立连接入口；`insert_repair_order` 接受调用者连接。006 新增 `list_owned_orders`、`find_visible_order` 连接内查询，SQL 限定本人/对象范围和输出列；不能将无授权 get_repair_order 直接暴露给 HTTP |
 | [app/m3/service.py](../../app/m3/service.py) | 创建仍用 BEGIN IMMEDIATE；`list_my_orders` / `read_order` 用只读连接 + BEGIN，在同一快照内检查 ACTIVE、真实权限并查询。`_require_active_user`、`_permissions_for` 分离身份有效性与权限；`_require_reporter` 保留为创建入口。房间规则集中在 `reportable_rooms` |
 | 上述 service / repository 的派单入口 | `dispatch_queue` / `list_repairers` 只读事务；`assign_order` 写事务。`eligible_repairers` 统一人员资格；`assign_reported_order` 只更新 id/status 匹配记录，调用者检查 rowcount 并提交。派单相关 `_schema_ready(..., assignment=True)` 额外检查 role 表 |
+| 上述 service / repository 的受理/开始入口 | `assigned_orders` / `list_assigned_orders` 同一只读快照授权并按本人 SQL 过滤；`start_repair` 写事务，`find_start_target` 只取 id/status/assigned_to，`start_assigned_order` 条件更新。开始操作不复用详情读取或派单候选资格 |
 | [app/m3/identity.py](../../app/m3/identity.py) | `authenticated_reporter(request)`：唯一真实身份接入入口，仅提取服务端用户 ID，不接受请求身份参数 |
 | [app/m3/models.py](../../app/m3/models.py) / [app/m3/errors.py](../../app/m3/errors.py) / [app/m3/router.py](../../app/m3/router.py) | 严格创建模型、路径 ID 校验、M3 专属错误转换及路由；动态 work-orders/{order_id} 排在静态路径之后，没有全局 handler 改动 |
 | [web/templates/m3/report.html](../../web/templates/m3/report.html) / [report.js](../../web/assets/m3/report.js) / [report.css](../../web/assets/m3/report.css) | 房间表单；复用公共 CSS 和静态资源挂载，失败保留输入，结果不明时禁止直接重发 |
 | [my-orders.html](../../web/templates/m3/my-orders.html) / [order-detail.html](../../web/templates/m3/order-detail.html) / [orders.js](../../web/assets/m3/orders.js) / [orders.css](../../web/assets/m3/orders.css) | 本人列表与详情；安全文本、保留正文换行、北京时间、空/加载/失败状态。刷新鉴权失败时清除上次正文 |
 | [dispatch.html](../../web/templates/m3/dispatch.html) / [dispatch.js](../../web/assets/m3/dispatch.js) / [dispatch.css](../../web/assets/m3/dispatch.css) / [time.js](../../web/assets/m3/time.js) | 管理队列、状态筛选、带 label 的派单表单；time.js 从原查询页提取，查询与派单共用北京时间转换，没有新增依赖 |
+| [assigned.html](../../web/templates/m3/assigned.html) / [assigned.js](../../web/assets/m3/assigned.js) | 本人受理列表、筛选和开始按钮；复用 orders.css/time.js，四张既有 M3 页面新增入口。无浏览器身份开关 |
 | [tests/m3/conftest.py](../../tests/m3/conftest.py) | 临时迁移组装及真实共享数据夹具；只在 pytest 临时目录使用 V1 + 临时 V2，无正式版本占号 |
 | [app/bootstrap.py](../../app/bootstrap.py) / [app/common/db.py](../../app/common/db.py) | 复用 `initialize_database(..., migrations_dir=...)` 及 `connect_database`，没有修改公共实现 |
 
@@ -60,15 +62,25 @@
 
 M3-R02 的以上模块契约仍为暂定方案；真实登录、正式授权与公共迁移联调必须另行验收。PR #1 的通用 state_rules 尚未在基线中，未复制其提交；整合后在 `service.assign_order` 的状态检查处复用通用函数，仍保留事务内复核、条件 UPDATE 和 rowcount 检查。
 
+### 本人受理与开始维修（008）
+
+- GET `/m3/work-orders/assigned`：ACTIVE + repair:read_assigned，同一只读连接/BEGIN 中授权并查询，SQL 固定 assigned_to=当前用户，管理员同样仅本人。默认全部，可选 `?status=ASSIGNED` 或 `IN_REPAIR`；其他参数、空/非法状态或重复 status 均 422。按 created_at DESC、id DESC，无分页；静态路径先于动态 ID。
+- 返回 `{"items":[],"total":0}` 或真实列表。每项白名单为 `id, room_id, room_name, fault_type, status, created_at, assigned_at, started_at, updated_at, can_start`。示例：`{"items":[{"id":1,"room_id":10,"room_name":"虚构教室","fault_type":"OTHER","status":"ASSIGNED","created_at":"2026-11-18T15:00:00Z","assigned_at":"2026-11-18T15:00:00Z","started_at":null,"updated_at":"2026-11-18T15:00:00Z","can_start":true}],"total":1}`。can_start 仅代表读取时具有 start 且状态为 ASSIGNED；列表不要求 start。
+- POST `/m3/work-orders/{order_id}/start`：必须显式发送 `{}`，不接受任何字段、缺失体或非对象。身份来自原适配入口。**开始只要求 ACTIVE + repair:start + assigned_to 为本人，不要求 repairer 角色或任一读取/报修/派单权限**；派单时的候选资格是独立约束，不能直接套用，也没有 admin 绕过。
+- 同一 BEGIN IMMEDIATE 内依次验证用户与 start 权限（401/403，先于目标查询）、解析 ID/查询存在性（404）、本人受理（403）、ASSIGNED 状态（409），然后执行 `WHERE id=? AND status='ASSIGNED' AND assigned_to=?` 更新并要求 rowcount=1。REPORTED 因 assigned_to 为 NULL 按对象授权拒绝 403，不构造不合法状态记录。
+- 只改 status=IN_REPAIR、started_at、updated_at；两时间为同一个服务端 UTC 秒值，允许与派单/创建时间相同。派单字段、created_at 和正文保持原样。成功提交后 **200** 最小摘要，例如 `{"id":1,"status":"IN_REPAIR","started_at":"2026-11-18T15:00:00Z","updated_at":"2026-11-18T15:00:00Z"}`；没有读取权限的用户不会因此获得完整详情。超大 ID 404；未知异常 500、真实锁超时 503，更新/提交失败全部回滚。
+- GET `/m3/assigned` 是公开壳，数据与写操作均鉴权；页面显示只读记录、筛选、详情链接、北京时间，仅 can_start 的 ASSIGNED 显示按钮。提交中禁止重复；成功更新当前列表的状态/开始时间，筛选 ASSIGNED 时移出；409 重新查询，鉴权失败清除私有内容和操作入口。结果不明不自动重发，即使手动查询仍不会重发同一条结果不明的请求，提示核对当前状态。
+- PR #1 仍未进入基线。后续可在 `service.start_repair` 的对象授权后、状态检查处复用其通用规则；事务内重查、对象授权、条件 UPDATE 与 rowcount 不能移除。本轮未修改任何公共 schema、种子、原始 V1 或默认数据库。
+
 错误形状统一为 `{"error":"<code>","message":"<中文说明>"}`，仅作用于上述 M3 路由：
 
 | 状态 | error / 场景 |
 |---|---|
 | 401 | `unauthenticated`：没有有效会话，或事务内发现用户不存在/已禁用 |
-| 403 | `forbidden`：创建/房间候选缺 repair:report；本人列表缺 repair:read_own；详情三种读取权限均无；管理队列/维修候选/派单缺 repair:assign |
-| 404 | `not_found`：具体工单不可见或不存在，完全相同的 `{"error":"not_found","message":"工单不存在或不可访问"}`，不泄漏正文或存在性 |
-| 409 | `conflict`：工单已不是 REPORTED 或条件更新未命中，拒绝覆盖原派单 |
-| 422 | `invalid_request`：类型/文本/字段、状态筛选或路径 ID 错误；`unknown_room`：房间不存在；`invalid_repairer`：目标不满足资格。派单校验提示只说明 assigned_to/派单格式，不输出原始输入或报修字段提示 |
+| 403 | `forbidden`：缺少对应功能权限（report/read_own/read_assigned/assign/start）；开始操作不是实际受理人。详情仍按独立权限矩阵 |
+| 404 | `not_found`：详情不可见/不存在、派单或开始目标不存在均用 `{"error":"not_found","message":"工单不存在或不可访问"}`。开始操作按本批明确规则对存在但非本人受理返回 403，不返回正文 |
+| 409 | `conflict`：派单非 REPORTED、开始非 ASSIGNED 或相应条件更新未命中，不覆盖首次派单/开始时间 |
+| 422 | `invalid_request`：类型/字段、状态筛选或路径 ID 错误；`unknown_room`：房间不存在；`invalid_repairer`：目标不满足派单资格。派单提示 assigned_to 格式，开始提示必须空 JSON 对象，不输出原始输入 |
 | 503 | `auth_unavailable`：指定 G2 认证模块未安装；`storage_unavailable` / `schema_unavailable`：本模块明确检查到库/必需表未准备；`database_busy`：真实锁竞争；`dependency_unavailable`：G2 明确返回 503 |
 | 500 | `internal_error`：未知数据库/代码故障，不向客户端泄漏 SQL、库路径或堆栈 |
 
@@ -87,7 +99,7 @@ M3-R02 的以上模块契约仍为暂定方案；真实登录、正式授权与�
 - SHA-256：`a23f6dbaed498d2bfda0d5942306a6d3535b8bf8f724ed0401474ac57259d319`。测试组装前实际校验，根 `.gitattributes` 保持 SQL 为 LF；更新依赖须重新记录来源及校验，不能静默改快照。
 - 依赖字段：`app_user(id, status)` 及既有授权表；`room(id, name, capacity, is_active)`。工单的 reporter/assignee/assigner 引用真实 app_user，room_id 引用真实 room；ON DELETE RESTRICT 保留历史。角色/ACTIVE 校验不是外键保证的能力。
 - 认证参考同提交的 [app/d/auth/dependencies.py](https://github.com/lyjlyjlyjly/campus-seat-reservation/blob/dd7474918e9ca956e8fb2549fd6ea0ee1ac58042/app/d/auth/dependencies.py)：`current_user`、`require_permission(code)`；[app/d/auth/users.py](https://github.com/lyjlyjlyjly/campus-seat-reservation/blob/dd7474918e9ca956e8fb2549fd6ea0ee1ac58042/app/d/auth/users.py)：`SessionUser(id, username, display_name, roles, permissions)`，会话 Cookie 为 campus_session。此代码尚未作为本批真实集成依赖运行。
-- 当前共享读取集中在 `identity.authenticated_reporter`、`service._require_active_user` / `_permissions_for` 与 `service.reportable_rooms`。不修改共享身份、授权或空间数据；新增 report/read_own/read_assigned/assign 权限仅写入测试临时库，正式初始化仍由整合人员执行。
+- 当前共享读取集中在 `identity.authenticated_reporter`、`service._require_active_user` / `_permissions_for` 与 `service.reportable_rooms`。不修改共享身份、授权或空间数据；五个 M3 权限仅在测试临时库初始化，正式初始化仍由整合人员执行。
 
 ## 暂定规则与可调整位置
 
@@ -96,7 +108,7 @@ M3-R02 的以上模块契约仍为暂定方案；真实登录、正式授权与�
 - 描述保存 strip 后的 1–1000 个 Unicode 码点，中文/非 BMP 字符按字符而非 UTF-8 字节计数；保留正文内部空白，不截断、不做额外 Unicode 合并。SQL 显式列出与 Python 3.10 strip 一致的空白字符，直接写入未规范化文本也拒绝。升级 Python 时须复核该集合。
 - **本批技术边界：拒绝描述中的 U+0000（NUL）**。SQLite length(TEXT) 在它之前停止计数，会与 Python len 产生偏差，因此 SQL 用 instr 排除；这会拒绝含 NUL 的输入，PR #2 本身仍可接受该字符串，限制只在存储/后续创建业务层生效。
 - 005 进一步拒绝 JSON 中不能编码为 UTF-8 的孤立代理码点，返回 422 而非把编码错误带入数据库。前端同样按 Python 空白集合规范化并用 `Array.from` 计码点，未设置按 UTF-16 计数的 maxlength，也不截断正文。结果不明不自动重发 POST，并阻止再次提交，提示先核实已有工单。
-- REPORTED：assigned_to、assigned_by、assigned_at、started_at 全部 IS NULL；ASSIGNED：前三项 IS NOT NULL、started_at IS NULL；IN_REPAIR：四项全 IS NOT NULL。status 自身 NOT NULL 且限三值。数据库约束只保证字段组合；007 已实现派单的事务内重查/条件更新，开始维修尚未实现。后续接入 PR #1 不能替代事务与操作者授权。
+- REPORTED：assigned_to、assigned_by、assigned_at、started_at 全部 IS NULL；ASSIGNED：前三项 IS NOT NULL、started_at IS NULL；IN_REPAIR：四项全 IS NOT NULL。status 自身 NOT NULL 且限三值。数据库约束只保证字段组合；007/008 已实现派单/开始的事务内重查和条件更新。后续接入 PR #1 不能替代事务与操作者授权。
 - created_at/updated_at 由 repository 生成 UTC `YYYY-MM-DDTHH:MM:SSZ`，初始相同。数据库外键不代替真实认证、ACTIVE/角色检查、对象授权或后续并发更新检查。
 
 沿用五权限提案，初始化及最终授权由整合人员与 G2 处理：
@@ -107,7 +119,7 @@ M3-R02 的以上模块契约仍为暂定方案；真实登录、正式授权与�
 | repair:assign | admin；管理派单 |
 | repair:read_assigned、repair:start | repairer；仅本人受理工单，开始时须 ASSIGNED |
 
-维修资格暂定为 ACTIVE + repairer + repair:start，普通 admin 不自动成为合法受理人；007 的候选和派单已使用此资格，开始维修操作尚未实现。006 的详情读取仍按独立权限范围执行，不因新增派单而放宽本人列表。
+派单目标资格暂定为 ACTIVE + repairer + repair:start，普通 admin 不自动成为合法受理人。008 开始操作仅要求 ACTIVE + start + 实际受理人，不额外复核 repairer 角色或要求 read_assigned；仅读取者也不必有 start。006 详情和本人列表的原权限/范围保持独立。
 
 ## 正式接入步骤与责任
 
@@ -115,7 +127,7 @@ M3-R02 的以上模块契约仍为暂定方案；真实登录、正式授权与�
 2. 分配真实新迁移编号和编写人，将已经验证的 M3 SQL **迁入公共迁移目录**。同一接入变更删除 `app/m3/sql/repair_order.sql` 的副本并更新本文件、测试 SQL 引用，明确公共版本迁移是唯一维护位置，避免双份 SQL 分叉。之后 schema 变化新增版本，不重写已提交迁移。
 3. 测试改为组合正式完整迁移历史，移除对旧快照的运行依赖；核验空库、旧库升级、重复执行、真实数据保留和所有约束，不能仅改预期版本号使测试通过。
 4. 权限初始化由迁移/整合负责人按 G2 确认的五权限映射写入正式后续版本，保留原 room 授权；不由 M3 请求写授权表。共享测试由其负责人调整 `tests/d/test_auth_schema.py` 等“版本固定为 1、权限数 2、全表映射四行、student 完全无权限”的假设，保留原 M2 授权断言；M3 只维护本模块测试。
-5. 005/006/007 已实现创建、查询及手动派单，正式接入时完成上述 G2 装配和真实会话验收；本批无需新增表或迁移。核对真实 role 字段及 repairer/start/assign 初始化，保留候选与提交共用资格规则。核对 M3Route 在共享错误处理器存在时仍保持局部响应及派单专属校验提示，避免双层包装。
+5. 005–008 已实现创建、查询、手动派单和开始维修，正式接入时完成上述 G2 装配和真实会话验收；008 无需新增表或迁移。核对 repairer/五权限初始化，保留派单资格与开始权限的区别。核对 M3Route 在共享错误处理器存在时保持局部响应及派单/开始各自校验提示，避免双层包装。需求基线仍是 main 的骨架状态，由整合人员依据各批实际证据统一更新，不能把未合并功能写成共同基线已交付。
 
 ## 可复现验证与接入后清单
 
@@ -125,16 +137,16 @@ M3-R02 的以上模块契约仍为暂定方案；真实登录、正式授权与�
 .\.venv\Scripts\python.exe -m pytest tests/m3/test_schema.py tests/m3/test_repository.py -q
 .\.venv\Scripts\python.exe -m pytest tests/m3 -q
 .\.venv\Scripts\python.exe scripts/ci.py
-node --test tests/m3/report_page.test.cjs tests/m3/order_pages.test.cjs tests/m3/dispatch_page.test.cjs
+node --test tests/m3/report_page.test.cjs tests/m3/order_pages.test.cjs tests/m3/dispatch_page.test.cjs tests/m3/assigned_page.test.cjs
 ```
 
-004/005/006 的历史结果见各自 spec；006 的隔离规则破坏实验保留原记录，本批不重复同一实验。本批结果以 [007 spec](../specs/M3-LOCAL-007-manual-assignment.md) 的实际执行记录为准，不把其他未合并分支算作联合验证。JS 检查使用本机现有 Node 标准库，无 npm 依赖；现有 CI 仍按 Python 脚本执行，没有改 CI 或假称已在 CI 运行 JS。
+004–007 的历史结果见各自 spec；006 的隔离规则破坏实验保留原记录，本批不重复同一实验。本批结果以 [008 spec](../specs/M3-LOCAL-008-start-repair.md) 的实际执行记录为准，不把其他未合并分支算作联合验证。JS 检查使用本机现有 Node 标准库，无 npm 依赖；现有 CI 仍按 Python 脚本执行，没有改 CI 或假称已在 CI 运行 JS。
 
 HTTP 启动检查和浏览器工具可用性记录见当前 spec。HTTP 200、HTML 断言和 DOM 替身测试均不等于浏览器交互验收；真实共享登录、公共正式迁移的联合验收仍未执行。
 
-007 当前状态为 **M3-R02 模块实现已验证**：真实临时库权限/资格/状态/并发/回滚及原流程回归通过，具体命令与数量只在当前 spec 维护。浏览器工具通信管道不可用，实际点击验收仍待进行；两项本地 HTTP 检查服务已停止。
+008 的本人受理列表、开始操作及 API 模块流程测试已实现并验证；模块内报修→派单→维修中流程通过。具体命令/数量及 HTTP/浏览器工具证据只在当前 spec 维护。模块流程使用真实权限/SQL/事务和测试外部身份边界，不是共享登录联调。浏览器工具 native pipe 不可用，真实点击验收仍待完成；本批两个临时 HTTP 服务已停止，测试库保留。
 
-本机查看页面：在项目根目录运行 `.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload`，打开 `http://127.0.0.1:8000/m3/dispatch`（或现有 report/my-orders/orders 页面）。当前正常基线必须显示认证未接入、拒绝数据读取及提交，不提供演示身份开关。正向派单行为可复现 `.\.venv\Scripts\python.exe -m pytest tests/m3/test_assignment.py -q`；真实浏览器成功创建/查询/派单需整合上述登录、授权和正式迁移后再验收。
+本机查看页面：在项目根目录运行 `.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload`，打开 `http://127.0.0.1:8000/m3/assigned`，其余 M3 页面导航也可进入。当前正常基线必须显示认证未接入、拒绝数据读取及提交，不提供演示身份开关。正向模块行为可复现 `.\.venv\Scripts\python.exe -m pytest tests/m3/test_start_repair.py -q`；真实浏览器报修→派单→开始需完成上述登录、授权和正式迁移后再验收。
 
 测试使用真实 SQL/初始化器/连接，不 mock 数据库；fixture 的虚构用户没有登录用途，既有 M2 申请记录只存在于临时库中，用于证明升级未破坏业务数据。临时故障触发器仅用于证明 repository 事务回滚，不进入应用 SQL。
 
@@ -149,4 +161,7 @@ HTTP 启动检查和浏览器工具可用性记录见当前 spec。HTTP 200、HT
 - [ ] 停借房间规则、对象访问响应、服务端身份/时间和失败回滚通过真实接口验收；没有默认登录或测试适配器进入正常路径。
 - [ ] 真实管理员查看队列，合法候选与服务端角色/权限一致；成功派单的受理人/操作者/时间正确，原字段不变，维修人员可按 read_assigned 查看详情。
 - [ ] 候选加载后禁用/撤权/移除角色仍拒绝；重复、并发派单及提交错误不会覆盖或部分更新；409/422 页面刷新与结果不明人工核对流程通过浏览器验收。
-- [ ] 开始维修另批接入状态规则及条件更新；007 只交付手动派单，不含重新派单或维修操作。
+- [ ] 真实两名受理人及管理员的 assigned 列表互相隔离；仅 read_assigned 能查询但不能开始，仅 start 的实际受理人能开始但无完整详情。
+- [ ] 开始接口只接受必填空对象，401/403/404/对象 403/409 顺序正确，撤权/禁用/并发/更新或提交失败不覆盖时间；列表 can_start 不能替代写入授权。
+- [ ] 浏览器完成本人受理筛选、开始成功后的状态与北京时间、冲突刷新、鉴权清理及结果不明不重发；真实账号跑通报修→派单→开始→报修人详情/管理队列。
+- [ ] 待验收、完成、退回、重新派单、评价、超时、座位及 M1 联动继续留在后续批次，不能将本批记为 M3-R03 全部完成。

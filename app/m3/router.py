@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse
 from app.common.config import PROJECT_ROOT
 from app.m3.errors import M3Route, ReportError
 from app.m3.identity import authenticated_reporter
-from app.m3.models import AssignmentCreate, ReportCreate, parse_order_id
+from app.m3.models import AssignmentCreate, RepairStart, ReportCreate, parse_order_id
 from app.m3 import service
 
 
@@ -42,6 +42,11 @@ def order_page(order_id: str, request: Request) -> HTMLResponse:
     return _page(request, "order-detail.html", order_id)
 
 
+@router.get("/assigned", include_in_schema=False, response_class=HTMLResponse)
+def assigned_page(request: Request) -> HTMLResponse:
+    return _page(request, "assigned.html")
+
+
 @router.get("/rooms")
 def rooms(request: Request, reporter_id: int = Depends(authenticated_reporter)) -> dict:
     return {"items": service.list_rooms(request.app.state.settings.database_path, reporter_id)}
@@ -69,6 +74,21 @@ def dispatch_orders(request: Request, status: str = "REPORTED", reporter_id: int
 @router.get("/repairers")
 def repairers(request: Request, reporter_id: int = Depends(authenticated_reporter)) -> dict:
     return service.list_repairers(request.app.state.settings.database_path, reporter_id)
+
+
+@router.get("/work-orders/assigned")
+def assigned_work_orders(request: Request, status: str | None = None, reporter_id: int = Depends(authenticated_reporter)) -> dict:
+    if set(request.query_params) - {"status"} or len(request.query_params.getlist("status")) > 1:
+        raise ReportError(422, "invalid_request", "本人受理列表仅接受一个可选 status，身份由服务端确定")
+    return service.assigned_orders(request.app.state.settings.database_path, reporter_id, status)
+
+
+@router.post("/work-orders/{order_id}/start")
+def start_work_order(
+    order_id: str, payload: RepairStart, request: Request,
+    reporter_id: int = Depends(authenticated_reporter),
+) -> dict:
+    return service.start_repair(request.app.state.settings.database_path, reporter_id, order_id)
 
 
 @router.post("/work-orders/{order_id}/assign")
