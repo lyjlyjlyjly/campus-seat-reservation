@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>我的工单 · 校园资源服务平台</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/assets/m3/orders.css">
+  <script src="/assets/m3/orders.js" defer></script>
+</head>
+<body>
+  <main id="orders-page" class="page m3-orders" data-mode="list" data-login-available="{{LOGIN_AVAILABLE}}">
+    <nav aria-label="报修导航"><a href="/">返回首页</a><a href="/m3/report">新建房间报修</a></nav>
+    <p class="eyebrow">M3 · 物业报修</p>
+    <h1>我的工单</h1>
+    <p class="intro">这里只展示本人提交的报修，包括管理员账号。按创建时间从新到旧排列。</p>
+    <section class="module" aria-label="本人工单">
+      <p id="orders-message" class="orders-message" role="status" aria-live="polite">正在加载本人工单…</p>
+      <a id="orders-login" href="/m2/login" hidden>前往登录</a>
+      <button id="reload-orders" type="button">重新加载</button>
+      <noscript><p>请启用 JavaScript 以读取工单。</p></noscript>
+      <div id="orders-content"></div>
+    </section>
+    <footer><p>当前仅支持房间报修。若此前提交结果不明，请核对描述及时间；请勿将最新工单直接当成本次提交的结果。</p></footer>
+  </main>
+</body>
+</html>
