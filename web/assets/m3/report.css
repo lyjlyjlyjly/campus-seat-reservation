@@ -1,0 +1,18 @@
+.m3-report { max-width: 820px; padding-top: 32px; }
+.m3-report .eyebrow { margin-top: 32px; }
+.m3-report .module { margin-top: 24px; }
+.m3-report fieldset { border: 0; margin: 20px 0 0; padding: 0; min-width: 0; }
+.m3-report label { display: block; font-weight: 600; margin: 20px 0 6px; }
+.m3-report select, .m3-report textarea { width: 100%; font: inherit; padding: 10px 12px; border: 1px solid #8199ac; border-radius: 6px; background: #fff; color: #173047; }
+.m3-report textarea { resize: vertical; }
+.m3-report button { font: inherit; border: 1px solid #245d84; border-radius: 6px; padding: 10px 20px; background: #245d84; color: white; cursor: pointer; }
+.m3-report button:disabled { cursor: not-allowed; opacity: .6; }
+.m3-report .secondary { display: block; margin-top: 12px; background: white; color: #245d84; padding: 6px 12px; }
+.m3-report .help { font-size: .87rem; color: #4c6172; margin: 6px 0; }
+.m3-report .character-count { text-align: right; font-size: .87rem; margin: 4px 0 18px; }
+.m3-report .report-message { padding: 12px 14px; border-radius: 6px; background: #edf3f8; overflow-wrap: anywhere; }
+.m3-report .report-message[data-kind="error"], .m3-report .character-count[data-invalid="true"] { color: #8d271f; }
+.m3-report .report-message[data-kind="success"] { background: #eaf5ed; color: #215a37; }
+.m3-report :is(button, select, textarea):focus-visible { outline: 3px solid #648dae; outline-offset: 3px; }
+.m3-report .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); }
+.m3-report [hidden] { display: none; }
