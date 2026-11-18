@@ -1,0 +1,7 @@
+.m3-dispatch label { display: block; margin: 12px 0 6px; font-weight: 600; }
+.m3-dispatch select { max-width: 100%; min-width: 220px; padding: 8px; font: inherit; border: 1px solid #a7bac8; border-radius: 6px; background: white; }
+.m3-dispatch fieldset { border: 1px solid #d9e3eb; border-radius: 8px; padding: 16px; }
+.m3-dispatch fieldset:disabled { opacity: .7; }
+.m3-dispatch #submit-assignment { display: block; margin-top: 16px; }
+.m3-dispatch #assignment-detail { display: block; margin: 12px 0; }
+.m3-dispatch #assignment-detail[hidden] { display: none; }
