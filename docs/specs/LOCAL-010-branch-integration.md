@@ -1,6 +1,6 @@
 # LOCAL-010：按责任组合入现有分支成果
 
-日期：2026-11-27。范围：现有 infra、G2 和 G3 分支的主分支整合。状态：实施中，结果以各批 PR 与检查记录为准。
+日期：2026-11-27。范围：现有 infra、G2 和 G3 分支的主分支整合。状态：infra 与 M3 源码、交接文档已分批合入；共享数据库和认证公共层待跨组人工评审，G2 后续批次尚未合入。
 
 ## 范围与约束
 
@@ -56,7 +56,48 @@
 
 ## 检查与交付记录
 
-- 2026-11-27：核对来源 refs、工作区与分支祖先关系；原工作区及用户的新 clone 保持其现有分支与文件。
-- 规则基线：`python scripts/install_git_hooks.py` 已为整合使用的 clone 安装 hook；`python scripts/check_git_policy.py --base origin/main --head HEAD`、`python scripts/check_notes.py`、`git diff --check` 通过。
-- 本次行为测试尚未运行；原分支历史结果不作为本次整合证据。后续 PR 检查与人工审阅按实际结果追加。
-- 公共层/schema 的跨组人工评审尚未记录；不得填写未实际参与的审阅人。
+### 实际顺序与范围
+
+2026-11-27 核对来源 refs、工作区与祖先关系后，先合入仓库门禁。公共数据库和认证公共层的跨组人工评审尚未记录，因此先接收可以独立保存源码、保持拒绝未认证请求的 M3 批次。M3 仍使用原临时库测试边界，未把测试迁移或身份装配作为正式运行环境。
+
+每个批次从当时最新的 `origin/main` 建立独立分支；M3 使用带来源标记的单个原提交，再为规格入口或已有用例的依赖条件做小提交。G2 数据库、口令工具及文档按目录导入，避免把原分支的跨组历史或旧 scope 混入新的 PR。只对无冲突、检查通过的 PR 执行合入；保留原来源分支及提交。
+
+### 已接收与待评审批次
+
+以下 head 是对应整合 PR 的最终提交，合入 SHA 是该批更新 main 后的提交；均为短 SHA，可从 PR 查到完整值。CI 一栏记录新整合提交的自动 push／PR 检查，不引用旧来源的测试结果。
+
+| 批次 | PR | head | 合入 SHA / 状态 | 自动 CI |
+|---|---|---|---|---|
+| infra 规则、门禁和 Review1 删除 | [#10](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/10) | `b1b5bd2` | `8597d2e`，已合入 | push／PR 均成功 |
+| G3 共享数据库 V1、种子与说明 | [#11](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/11) | `271ba2e` | 待跨组人工评审，未合入 | push／PR 均成功 |
+| M3 独立状态规则 | [#12](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/12) | `de08821` | `2a27963`，已合入 | push／PR 均成功 |
+| M3 独立文本规范化 | [#13](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/13) | `fe25617` | `3483f57`，已合入 | push／PR 均成功 |
+| M3 契约提案文档 | [#14](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/14) | `c5c35d7` | `bc2385a`，已合入；仍是提案 | push／PR 均成功 |
+| M3 持久化 | [#15](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/15) | `3c4799c` | `b3c0523`，已合入 | push／PR 均成功 |
+| G2 spec 与 ADR 编号整理 | [#16](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/16) | `63504f8` | `170ae3c`，已合入 | push／PR 均成功 |
+| G2 口令公共工具与原有用例 | [#17](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/17) | `bfa6826` | 待跨组人工评审，未合入 | push／PR 均成功 |
+| M3 创建接口与表单 | [#18](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/18) | `3215bae` | `f1875fc`，已合入 | push／PR 均成功 |
+| M3 本人工单查询 | [#19](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/19) | `a16f1be` | `812ff1f`，已合入 | push／PR 均成功 |
+| M3 手动派单 | [#20](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/20) | `8ca0188` | `b9a9b62`，已合入 | push／PR 均成功 |
+| M3 本人受理及开始维修 | [#21](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/21) | `c922f3a` | `a6d1b74`，已合入 | push／PR 均成功 |
+| M3 交接与历史状态修订 | [#22](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/22) | `11051d2` | `bd73a23`，已合入 | push／PR 均成功 |
+
+原 #1–#9 的内容已通过上述新 PR 接收，对应旧 PR 均已关闭，原分支保留。公共入口说明随独立 infra 文档批次维护，其检查以所在 PR 为准。
+
+### 实际检查与差异
+
+- 整合使用的 clone 已安装 `.githooks`；每批执行 `python scripts/check_git_policy.py --base origin/main --head HEAD`，实际 push 也通过本地门禁。每次只更新一个分支/ref、最多一个业务责任组，提交标题使用对应 Conventional Commit scope。
+- `python scripts/check_notes.py`、Python 编译及 `git diff --check` 已按改动执行；文档批次另做普通 Markdown 相对文件链接检查。没有跳过门禁、删除拒绝断言或关闭错误处理。
+- 本地行为测试未运行；远端既有 CI 自动执行 Git 规则、Note、编译和 pytest。Node 页面测试本次未运行，远端 CI 也未包含 Node。原 spec 的实验与数量保留原日期，不作为本次重跑证据。
+- M3 005–008 只修改既有用例的外部依赖前置条件：缺认证时显式模拟 `app.d.auth.dependencies` 缺失，缺登录页时显式隔离 `/m2/login` 路由。原测试函数、成功／拒绝断言、真实 service、SQL 与事务保留；未额外编写新测试或按实际响应生成预期结果。
+- 比对确认，M3 业务源码及页面与 `c3369bf` 一致，另纳入独立的 `state_rules.py` 和 `report_validation.py`。这两个函数尚未由现有 service/model 统一复用，不能把文件合入视为调用整合完成。
+- G2 原 V1 与 M3 固定测试快照的 Git blob 均为 `9e811019bda02bb8a2fefac2712ec1fe6fb96a61`；#11 原样保留 V1，未新增正式 M3 迁移或 repair 权限。
+- 通过远端 `ls-remote` 再次核对 11 个原来源分支，均仍指向本任务记录的原始提交；没有删除分支、强推或改写来源历史。
+- ADR-004 继续作为已采纳的单模块推送规则；会话提案改为 ADR-005，仍为 proposed。G2 spec 使用 G2-LOCAL-001/002，活动入口不再引用已删除的 Review1 文件。
+
+### 剩余依赖与验收边界
+
+1. [AGENTS.md](../../AGENTS.md#目录与边界) 要求公共层/schema PR 由另一组成员实际评审。#11、#17 尚无记录，不能将 Agent 自查或 CI 成功当作人工批准。其余 G2 会话／认证装配及 M2 申请审批源码已核对来源，仍需在前置评审和合入后按 G2 范围分批接收。
+2. main 默认初始化仍为版本 0，种子未安装演示账号。M3 正式工单迁移、五项 repair 权限映射、真实共享登录联调及浏览器人工验收尚未接入；这些缺口不在本任务中新增公共契约或依赖来填补。
+3. 需求状态以 [需求基线](../requirements.md) 为准；M3 调用、迁移及验收前置只在 [M3 交接](../m3/INTEGRATION.md) 维护。源码、自动 CI、完整业务交付和人工验收分别记录。
+4. 本轮未修改 GitHub 分支保护设置。PR、必需检查和跨组评审的远端强制策略仍须由负责人配置，不能仅凭 YAML 宣称开启。
