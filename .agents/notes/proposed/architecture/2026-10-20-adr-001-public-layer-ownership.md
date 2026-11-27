@@ -4,7 +4,7 @@ Status: proposed — 分工来自计划，等待三组确认和会议记录
 
 Date: 2026-10-20
 Owner: 项目负责人协调 G1、G2、G3
-References: [任务规格](../../../../docs/specs/000-repository-bootstrap.md)、[Review 1 计划](../../../../docs/Review1计划.md)
+References: [任务规格](../../../../docs/specs/000-repository-bootstrap.md)、[需求基线](../../../../docs/requirements.md)
 
 ## Problem
 

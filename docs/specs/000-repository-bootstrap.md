@@ -4,7 +4,7 @@
 
 ## 背景与授权
 
-用户要求依据 [PJ 计划书](../PJ-计划书.md) 和 [Review 1 计划](../Review1计划.md) 建立仓库结构、项目规则、AI 协作方式、CI 及 Agent Note 规范，随后追加使用 archify 按三组分工绘制项目逻辑图。两天计划限定本轮范围；长期计划中的部署、定时任务和跨模块写回继续保留为后续工作。
+用户要求依据 [PJ 计划书](../PJ-计划书.md) 和当时的 Review 1 计划建立仓库结构、项目规则、AI 协作方式、CI 及 Agent Note 规范，随后追加使用 archify 按三组分工绘制项目逻辑图。两天计划限定本轮范围；长期计划中的部署、定时任务和跨模块写回继续保留为后续工作。
 
 本任务使用上述计划已经选定的 FastAPI、SQLite、HTML/CSS、pytest，不改变业务契约；用户的实施指令是本次骨架工作的授权，不代表三组已经完成公共字段会议或 ADR 表决。
 
@@ -30,7 +30,7 @@
 
 ## 预计改动
 
-`AGENTS.md`、`README.md`、`.agents/notes/`、`.github/`、`app/`、`web/`、`database/`、`scripts/`、`tests/`，以及本任务新增的 `docs/` 文档。原始任务书和两份计划保留为输入依据。
+`AGENTS.md`、`README.md`、`.agents/notes/`、`.github/`、`app/`、`web/`、`database/`、`scripts/`、`tests/`，以及本任务新增的 `docs/` 文档。原始任务书和 PJ 计划书保留为输入依据；Review 1 计划已由用户从仓库删除，历史版本可从 Git 提交历史查阅。
 
 ## 验收标准
 

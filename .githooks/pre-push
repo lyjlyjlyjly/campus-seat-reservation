@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -eu
+
+repository_root=$(git rev-parse --show-toplevel)
+if [ -x "$repository_root/.venv/Scripts/python.exe" ]; then
+  python_command="$repository_root/.venv/Scripts/python.exe"
+elif [ -x "$repository_root/.venv/bin/python" ]; then
+  python_command="$repository_root/.venv/bin/python"
+elif command -v python3 >/dev/null 2>&1; then
+  python_command=$(command -v python3)
+elif command -v python >/dev/null 2>&1; then
+  python_command=$(command -v python)
+else
+  printf '%s\n' '单模块 push 检查需要 Python 3.10+。请安装 Python 并重试。' >&2
+  exit 1
+fi
+
+exec "$python_command" "$repository_root/scripts/check_git_policy.py" --root "$repository_root" --pre-push --remote "$1"
