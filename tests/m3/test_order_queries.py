@@ -7,6 +7,7 @@ from starlette.exceptions import HTTPException
 from app.common.config import Settings
 from app.common.db import connect_database
 from app.main import create_app
+from app.m3 import identity as m3_identity
 from app.m3.identity import authenticated_reporter
 
 
@@ -174,7 +175,7 @@ def test_m3_r01_read_rechecks_user_and_permissions_after_identity(query_app, que
         assert query_client.get(path).status_code == expected
 
 
-def test_m3_r01_read_authentication_errors_and_unavailable_dependency(query_app, query_client, query_data):
+def test_m3_r01_read_authentication_errors_and_unavailable_dependency(query_app, query_client, query_data, monkeypatch):
     def unauthenticated():
         raise HTTPException(401, "private session detail")
     query_app.dependency_overrides[authenticated_reporter] = unauthenticated
@@ -182,7 +183,16 @@ def test_m3_r01_read_authentication_errors_and_unavailable_dependency(query_app,
         response = query_client.get(path)
         assert response.status_code == 401
         assert "private" not in response.text
-    query_app.dependency_overrides.clear()  # 当前真实基线未安装 G2，不能默认使用测试身份。
+    # 明确模拟外部认证模块缺失，不依赖 G2 是否合入。
+    def missing_auth_module(name):
+        assert name == "app.d.auth.dependencies"
+        raise ModuleNotFoundError(
+            "shared authentication module unavailable",
+            name="app.d.auth.dependencies",
+        )
+
+    monkeypatch.setattr(m3_identity, "import_module", missing_auth_module)
+    query_app.dependency_overrides.clear()
     for path in ["/m3/work-orders", f"/m3/work-orders/{query_data['old']}"]:
         response = query_client.get(path)
         assert response.status_code == 503
@@ -233,7 +243,16 @@ def test_m3_r01_queries_do_not_take_write_lock_and_read_committed_snapshot(query
         writer.rollback()
 
 
-def test_m3_query_pages_and_navigation_do_not_render_private_data(query_client):
+def test_m3_query_pages_and_navigation_do_not_render_private_data(query_client, query_app, monkeypatch):
+    # 显式隔离外部登录页面，不依赖 G2 是否合入。
+    monkeypatch.setattr(
+        query_app.router,
+        "routes",
+        [
+            route for route in query_app.router.routes
+            if getattr(route, "path", None) != "/m2/login"
+        ],
+    )
     for path in ["/m3/my-orders", "/m3/orders/1"]:
         page = query_client.get(path)
         assert page.status_code == 200

@@ -1,5 +1,11 @@
 # M3-LOCAL-006：本人工单列表与详情
 
+## 2026-11-27 整合补充
+
+本批按 [LOCAL-010](LOCAL-010-branch-integration.md) 从 `e1fbd945251cdcc2cdc0a7d4226caa42f70ad8f0` 单独引入；前置创建功能已由 PR #18 合入 main。既有缺认证和无登录页用例显式构造外部依赖缺失场景，保留原有状态码、页面断言与真实被测业务，不再依赖 G2 是否已安装。生产代码与来源一致。
+
+本次本地行为测试未运行，自动 CI 结果以整合 PR 和 LOCAL-010 记录为准。以下 2026-11-18 的实现、实验及验证结果属于来源批次，不能作为本次重新执行的证据。
+
 ## 范围、依赖与授权
 
 2026-11-18 fetch 后，main 仍为 `d8918bbc`；[PR #4](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/4) 与 [PR #5](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/5) 均未合并。本批从 `origin/m3/local-005-report-create` 的 `49892f7e075f5b10ce4d2a2d9bae55b60ea74621` 建立 `m3/local-006-order-queries`；创建前无同编号任务、分支或 PR，工作区干净。依赖分支不修改，不引入 M2/infra 历史。
