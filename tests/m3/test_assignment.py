@@ -10,6 +10,7 @@ from starlette.exceptions import HTTPException
 from app.common.config import Settings
 from app.common.db import connect_database
 from app.main import create_app
+from app.m3 import identity as m3_identity
 from app.m3.identity import authenticated_reporter
 from app.m3.repository import get_repair_order
 
@@ -287,7 +288,16 @@ def test_m3_r02_missing_role_table_reports_schema_dependency(dispatch_client, da
         assert not connection.execute("SELECT 1 FROM sqlite_master WHERE name='role'").fetchall()
 
 
-def test_m3_r02_missing_auth_and_invalid_session_fail_closed(dispatch_app, dispatch_client, dispatch_data, database):
+def test_m3_r02_missing_auth_and_invalid_session_fail_closed(dispatch_app, dispatch_client, dispatch_data, database, monkeypatch):
+    # 明确模拟外部认证模块缺失，不依赖 G2 是否合入。
+    def missing_auth_module(name):
+        assert name == "app.d.auth.dependencies"
+        raise ModuleNotFoundError(
+            "shared authentication module unavailable",
+            name="app.d.auth.dependencies",
+        )
+
+    monkeypatch.setattr(m3_identity, "import_module", missing_auth_module)
     before = snapshot(database)
     def expired(): raise HTTPException(401,'private session')
     for identity, code in [(expired,401), (None,503)]:
@@ -300,7 +310,16 @@ def test_m3_r02_missing_auth_and_invalid_session_fail_closed(dispatch_app, dispa
     assert dispatch_client.get('/health').status_code == 200
 
 
-def test_m3_r02_public_page_assets_and_navigation(dispatch_client):
+def test_m3_r02_public_page_assets_and_navigation(dispatch_client, dispatch_app, monkeypatch):
+    # 显式隔离外部登录页面，不依赖 G2 是否合入。
+    monkeypatch.setattr(
+        dispatch_app.router,
+        "routes",
+        [
+            route for route in dispatch_app.router.routes
+            if getattr(route, "path", None) != "/m2/login"
+        ],
+    )
     html = dispatch_client.get('/m3/dispatch')
     assert html.status_code == 200 and 'data-login-available="false"' in html.text
     assert 'for="assigned-to"' in html.text and 'id="assignment-fields" disabled' in html.text
