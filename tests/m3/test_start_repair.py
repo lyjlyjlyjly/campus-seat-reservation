@@ -11,6 +11,7 @@ from starlette.exceptions import HTTPException
 from app.common.config import Settings
 from app.common.db import connect_database
 from app.main import create_app
+from app.m3 import identity as m3_identity
 from app.m3.identity import authenticated_reporter
 from app.m3.repository import get_repair_order
 
@@ -281,7 +282,16 @@ def test_m3_r03_list_is_read_only_without_write_lock(start_client,database):
     assert database.read_bytes()==before
 
 
-def test_m3_r03_missing_auth_and_expired_identity_fail_closed(start_app,start_client,start_data,database):
+def test_m3_r03_missing_auth_and_expired_identity_fail_closed(start_app,start_client,start_data,database,monkeypatch):
+    # 明确模拟外部认证模块缺失，不依赖 G2 是否合入。
+    def missing_auth_module(name):
+        assert name == "app.d.auth.dependencies"
+        raise ModuleNotFoundError(
+            "shared authentication module unavailable",
+            name="app.d.auth.dependencies",
+        )
+
+    monkeypatch.setattr(m3_identity, "import_module", missing_auth_module)
     before=snapshot(database)
     def expired(): raise HTTPException(401,'private session detail')
     for identity,status in [(expired,401),(None,503)]:
@@ -318,7 +328,16 @@ def test_m3_r03_module_flow_report_assign_start_query(start_client,start_identit
     assert get_repair_order(database,order_id)['started_at']==begun.json()['started_at']
 
 
-def test_m3_r03_public_page_navigation_and_asset_order(start_client):
+def test_m3_r03_public_page_navigation_and_asset_order(start_client,start_app,monkeypatch):
+    # 显式隔离外部登录页面，不依赖 G2 是否合入。
+    monkeypatch.setattr(
+        start_app.router,
+        "routes",
+        [
+            route for route in start_app.router.routes
+            if getattr(route, "path", None) != "/m2/login"
+        ],
+    )
     response=start_client.get('/m3/assigned')
     assert response.status_code==200 and 'data-login-available="false"' in response.text
     assert 'for="assigned-status"' in response.text
