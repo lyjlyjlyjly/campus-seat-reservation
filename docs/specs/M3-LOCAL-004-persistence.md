@@ -1,5 +1,7 @@
 # M3-LOCAL-004：模块工单持久化
 
+2026-11-27 整合说明：以下范围、确认与验证属于原任务；本次合入情况见 [LOCAL-010](LOCAL-010-branch-integration.md)。原 Review1 计划已删除，现行范围由需求基线维护；模块 SQL 仍未作为正式迁移安装。
+
 ## 范围与授权
 
 - 基准：2026-11-12 fetch 后的 `origin/main`，`d8918bbc6cdb59fdf5f7450b3c71b7950cf8fb5b`；独立分支 `m3/local-004-persistence`，创建前未发现同名分支、任务文件或 PR。
@@ -9,7 +11,7 @@
 - 本批不增加 HTTP/页面、派单/维修操作、真实认证/授权、座位报修、并发派单、验收评价、升级或 M3→M1 联动。
 - 发布授权（2026-11-18）：用户明确授权只提交本批 8 个文件，推送 `m3/local-004-persistence`，创建目标为 main 的独立 PR，并向 `lyjlyjlyjly` 请求评审；不合并 PR、不开始下一批。此授权替代实施阶段的“不 commit、不 push”限制，**不等于人工验收通过或公共契约获批**。实际提交、推送和评审状态以 Git / PR 记录为准。
 
-依据：[需求基线](../requirements.md)、[架构](../architecture.md)、[AGENTS.md](../../AGENTS.md)、[Review1计划](../Review1计划.md)，以及 [PR #3 固定版本契约](https://github.com/lyjlyjlyjly/campus-seat-reservation/blob/f1e18209e2f327e0ed7e331d9ec4051f71c91ba1/docs/specs/M3-LOCAL-001-contract-spec.md)。本次独立开发授权不改写 PR #1/#2/#3。
+依据：[需求基线](../requirements.md)、[架构](../architecture.md)、[AGENTS.md](../../AGENTS.md)，以及 [PR #3 固定版本契约](https://github.com/lyjlyjlyjly/campus-seat-reservation/blob/f1e18209e2f327e0ed7e331d9ec4051f71c91ba1/docs/specs/M3-LOCAL-001-contract-spec.md)。本次独立开发授权不改写 PR #1/#2/#3。
 
 ## 方案比较与选择
 
