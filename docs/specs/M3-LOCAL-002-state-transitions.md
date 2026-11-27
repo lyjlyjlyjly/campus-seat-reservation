@@ -1,5 +1,7 @@
 # M3-LOCAL-002：工单基础状态转换校验
 
+2026-11-27 整合说明：下文保留原任务的范围、确认及历史验证记录；本次合入情况见 [LOCAL-010](LOCAL-010-branch-integration.md)。原 Review1 计划已删除，现行范围由需求基线维护。
+
 日期：2026-11-12（北京时间）。需求：M3-R02、M3-R03 的基础状态规则。Issue：未创建。状态：基础状态规则完成并通过本地测试，尚未接入接口与持久化；用户已在本次会话明确人工验收通过，并授权提交、推送本批三个文件及创建 PR。团队代码评审仍待进行，提交、推送和合并状态以实际 Git/PR 记录为准。
 
 ## 背景、授权与基线
@@ -8,7 +10,7 @@
 
 2026-11-12 执行 `git fetch origin`（使用上轮已核实的系统代理，仅命令级配置）成功，远端无更新：main 为 `d8918bbc6cdb59fdf5f7450b3c71b7950cf8fb5b`，M2 为 `dd7474918e9ca956e8fb2549fd6ea0ee1ac58042`，infra 为 `bc1f1354c4b21eefdc718ffbd05912c734366070`。M2/infra 仍未合并。本批从 origin/main 创建 `m3/local-002-state-transitions`，没有引入其他分支代码。
 
-依据：[AGENTS.md](../../AGENTS.md)、[docs/requirements.md](../requirements.md)、[docs/architecture.md](../architecture.md)、[docs/Review1计划.md](../Review1计划.md)。本批只实现用户确认的现有状态顺序，不新增公共状态名、权限或接口契约。
+依据：[AGENTS.md](../../AGENTS.md)、[docs/requirements.md](../requirements.md)、[docs/architecture.md](../architecture.md)。本批只实现用户确认的现有状态顺序，不新增公共状态名、权限或接口契约。
 
 ## 范围与方案
 
