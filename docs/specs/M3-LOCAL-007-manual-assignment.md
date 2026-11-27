@@ -1,5 +1,11 @@
 # M3-LOCAL-007：管理员手动派单
 
+## 2026-11-27 整合补充
+
+本批按 [LOCAL-010](LOCAL-010-branch-integration.md) 从 `094f12dfff4f2f827f876ba4afe6f0bf06a16e77` 单独引入；前置本人查询已由 PR #19 合入 main。既有缺认证和无登录页用例显式隔离外部依赖，保留原有 401／503、数据库不变和页面断言，生产代码与来源一致。
+
+本次本地行为测试未运行，自动 CI 结果以整合 PR 和 LOCAL-010 记录为准。以下来源批次的验证、实验和授权记录保留原日期语境，不作为本次重跑或人工验收证据。
+
 ## 范围、基线与授权
 
 需求为 M3-R02 的模块手动派单。2026-11-18 fetch 后 main 仍为 `d8918bbc`，[PR #4](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/4)、[PR #5](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/5)、[PR #6](https://github.com/lyjlyjlyjly/campus-seat-reservation/pull/6) 均未合并。创建前工作区干净，无同编号分支/spec/PR。本批从 006 的 `e1fbd945251cdcc2cdc0a7d4226caa42f70ad8f0` 建立 `m3/local-007-manual-assignment`，不修改依赖分支。
