@@ -1,9 +1,11 @@
 # M3-LOCAL-003：报修文本输入校验
 
+2026-11-27 整合说明：下文保留原任务的范围、确认及历史验证记录；本次合入情况见 [LOCAL-010](LOCAL-010-branch-integration.md)。原 Review1 计划已删除，现行范围由需求基线维护。
+
 - 需求：M3-R01 的文本输入校验子任务；真实报修创建尚未实现。
 - 基准：`origin/main`，`d8918bbc6cdb59fdf5f7450b3c71b7950cf8fb5b`；分支 `m3/local-003-report-validation`。
 - 授权：用户于 2026-11-12 明确授权本批方案、实现和测试，并选择独立函数方案；完成后用户明确确认本批人工验收通过，授权仅提交、推送本批三个文件并创建面向 main 的独立 PR。不合并 PR #1 或本批 PR，不开始下一批。
-- 依据：[AGENTS.md](../../AGENTS.md)、[docs/requirements.md](../requirements.md)、[docs/architecture.md](../architecture.md)、[docs/Review1计划.md](../Review1计划.md)、[docs/PJ-计划书.md](../PJ-计划书.md)。
+- 依据：[AGENTS.md](../../AGENTS.md)、[docs/requirements.md](../requirements.md)、[docs/architecture.md](../architecture.md)、[docs/PJ-计划书.md](../PJ-计划书.md)。
 
 ## 事实与边界
 
