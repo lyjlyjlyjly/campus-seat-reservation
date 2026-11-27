@@ -55,7 +55,16 @@ def test_m3_errors_stay_local_with_future_shared_handler(report_app):
         assert client.get("/shared-test").json() == {"shared": True}
 
 
-def test_m3_page_and_assets_are_public_without_broken_login_link(report_client, report_app):
+def test_m3_page_and_assets_are_public_without_broken_login_link(report_client, report_app, monkeypatch):
+    # 显式隔离外部登录页面，不依赖 G2 是否合入。
+    monkeypatch.setattr(
+        report_app.router,
+        "routes",
+        [
+            route for route in report_app.router.routes
+            if getattr(route, "path", None) != "/m2/login"
+        ],
+    )
     response = report_client.get("/m3/report")
     assert response.status_code == 200
     assert "当前仅支持房间报修" in response.text
