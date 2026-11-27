@@ -7,6 +7,7 @@ from starlette.exceptions import HTTPException
 from app.common.config import Settings
 from app.common.db import connect_database
 from app.main import create_app
+from app.m3 import identity as m3_identity
 from app.m3.identity import authenticated_reporter
 from app.m3.repository import get_repair_order
 
@@ -170,7 +171,16 @@ def test_m3_r01_real_lock_conflict_never_returns_success(report_client, report_d
     assert count(report_database) == 0
 
 
-def test_m3_r01_missing_auth_fails_closed_without_affecting_app(report_database):
+def test_m3_r01_missing_auth_fails_closed_without_affecting_app(report_database, monkeypatch):
+    # 明确模拟外部认证模块缺失，不依赖 G2 是否合入。
+    def missing_auth_module(name):
+        assert name == "app.d.auth.dependencies"
+        raise ModuleNotFoundError(
+            "shared authentication module unavailable",
+            name="app.d.auth.dependencies",
+        )
+
+    monkeypatch.setattr(m3_identity, "import_module", missing_auth_module)
     application = create_app(Settings(database_path=report_database))
     with TestClient(application) as client:
         assert client.get("/").status_code == 200
