@@ -1,5 +1,7 @@
 # M3-LOCAL-001：M3 整体契约提案与开发基线
 
+2026-11-27 整合说明：本文作为历史契约提案纳入主线，公共契约仍待相关负责人确认。下文的分支、授权、测试与停止点记录属于原任务；当前整合情况见 [LOCAL-010](LOCAL-010-branch-integration.md)。后续模块实现不等于提案已获团队批准。
+
 初稿日期：2026-11-11；契约修订及独立提案发布授权：2026-11-12（北京时间）。准备工作及两个独立规则任务已有实际成果，详见第 1 节。本文作为独立文档提案提交团队评审，公共契约状态仍为 **推荐方案，待相关负责人确认，尚未获团队批准**。本次发布仅包含本文，不修改业务代码、迁移或其他成员文件，不合并 PR、不开始 A/B 实现。
 
 ## 1. 授权、范围与事实依据
@@ -31,7 +33,7 @@
 
 依据：[main 基准提交](https://github.com/lyjlyjlyjly/campus-seat-reservation/commit/d8918bbc6cdb59fdf5f7450b3c71b7950cf8fb5b)、[M2 分支快照](https://github.com/lyjlyjlyjly/campus-seat-reservation/tree/dd7474918e9ca956e8fb2549fd6ea0ee1ac58042)、[infra 分支快照](https://github.com/lyjlyjlyjly/campus-seat-reservation/tree/bc1f1354c4b21eefdc718ffbd05912c734366070)。仅使用 `git show`、树和提交差异读取其他分支；没有把它们的代码放入当前工作树。
 
-当前适用入口：[AGENTS.md](../../AGENTS.md)、[docs/requirements.md](../requirements.md)、[docs/architecture.md](../architecture.md)、[docs/Review1计划.md](../Review1计划.md)、[docs/PJ-计划书.md](../PJ-计划书.md)、[database/migrations/README.md](../../database/migrations/README.md)。未合并 infra 中的规则尚不是 main 的生效规则；后续依赖合入后重新读取。
+现行适用入口：[AGENTS.md](../../AGENTS.md)、[docs/requirements.md](../requirements.md)、[docs/architecture.md](../architecture.md)、[docs/PJ-计划书.md](../PJ-计划书.md)、[database/migrations/README.md](../../database/migrations/README.md)。原 Review1 计划已删除，规则门禁已在 LOCAL-010 首批接入 main；上表继续保留原任务核对时的历史基线。
 
 与本文有关的未合并实现，引用固定提交和完整文件名，避免与另一分支的 SPEC/ADR 编号混淆：
 
